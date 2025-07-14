@@ -7,6 +7,8 @@ declare module "next-auth" {
     interface Session extends DefaultSession {
         /** OAuth access_token，用来直连 Graph API 等 */
         accessToken?: string;
+        refreshToken?: string;   // ← 新增
+        expiresAt?: number;      // 可选：暴露过期时间检查我的代码, 令牌刷新是否正常工作
     }
 }
 
@@ -14,6 +16,8 @@ declare module "next-auth/jwt" {
     /** jwt() 回调里用的 token 对象 */
     interface JWT extends DefaultJWT {
         accessToken?: string;
+        refreshToken?: string;
+        expiresAt?: number;
     }
 }
 
