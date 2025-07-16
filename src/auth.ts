@@ -26,6 +26,7 @@ async function refreshAccessToken(refreshToken: string) {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
     MicrosoftEntraID({
