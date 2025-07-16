@@ -43,7 +43,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
     // 建议在生产环境开启 database / adapter；此处演示用 JWT
-    session: { strategy: 'jwt' },
+    session: {
+      strategy: 'jwt',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
 
     // 回调中可解构 profile / account 获取 access_token
     /** ① 首次登录，把 access/refresh/expires 都写进 JWT */
