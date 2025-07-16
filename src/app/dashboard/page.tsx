@@ -1,39 +1,49 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import Image from "next/image";
+import { listChildren } from "@/lib/onedrive";
+import DriveList from "@/components/DriveList";
 import { SignOutButton } from "@/components/SignOutButton";
-import { listRootChildren } from "@/lib/onedrive";
 
-export default async function DashboardPage() {
+interface DashboardProps {
+    searchParams?: { item?: string; path?: string };
+}
+
+export default async function DashboardPage({ searchParams }: DashboardProps) {
     const session = await auth();
     if (!session) redirect("/login");
 
-    const list = await listRootChildren();
+    const params = (await searchParams) ?? {};
+    const currentItemId = params.item;
+    const currentPath = params.path ?? "根目录";
+
+    const list = await listChildren(currentItemId);
 
     return (
-        <main className="p-8">
-            <h1 className="text-2xl mb-4">欢迎，{session.user?.name}</h1>
-            {/* OneDrive 文件列表 */}
-            <h2 className="text-xl mt-8 mb-2">OneDrive 根目录</h2>
-            <ul className="space-y-1">
-                {list.value.map((item) => (
-                    <li key={item.id} className="flex items-center gap-2">
-                        {item.folder ? "📁" : "📄"}
-                        <a
-                            href={item.webUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline text-blue-600"
-                        >
-                            {item.name}
-                        </a>
-                        <span className="text-sm text-gray-500">
-              ({(item.size / 1024).toFixed(1)} KB)
-            </span>
-                    </li>
-                ))}
-            </ul>
+        <main className="p-8 max-w-5xl mx-auto font-extralight">
+            {/* 顶部 */}
+            <div className="flex items-center gap-4 mb-8">
+                <Image
+                    src={session.user?.image ?? "/default-avatar.svg"}
+                    alt="avatar"
+                    width={48}
+                    height={48}
+                    className="rounded-full grayscale hover:grayscale-0 transition"
+                />
+                <h1 className="text-2xl font-normal tracking-tight">
+                    欢迎，{session.user?.name}
+                </h1>
+                <div className="ml-auto">
+                    <SignOutButton />
+                </div>
+            </div>
 
-            <SignOutButton />
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
+                当前位置：<span className="font-normal">{currentPath}</span>
+            </p>
+
+            {/* ⬇️ 把数据交给客户端组件渲染动画 */}
+            <DriveList items={list.value} currentPath={currentPath} />
         </main>
     );
 }
