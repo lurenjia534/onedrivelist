@@ -1,19 +1,26 @@
-import { auth } from "@/auth"
+import { auth } from "@/auth";
 
-const GRAPH_ROOT = "https://graph.microsoft.com/v1.0"
+const GRAPH = "https://graph.microsoft.com/v1.0";
 
-/** 列出当前用户 OneDrive 根目录的子项（文件 + 文件夹） */
-export async function listRootChildren() {
+/** 列出指定 DriveItem（或根）的 children */
+export async function listChildren(itemId?: string) {
     const session = await auth();
     if (!session?.accessToken) throw new Error("Not authenticated");
 
+    const endpoint = itemId
+        ? `/me/drive/items/${itemId}/children`
+        : "/me/drive/root/children";
+
     const res = await fetch(
-        `${GRAPH_ROOT}/me/drive/root/children?$select=id,name,folder,file,webUrl,size,lastModifiedDateTime`,
-        { headers: { Authorization: `Bearer ${session.accessToken}` } },
+        `${GRAPH}${endpoint}?$select=id,name,folder,file,webUrl,size,lastModifiedDateTime`,
+        {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+            cache: "no-store", // 开发期禁用 Next.js 路由缓存
+        },
     );
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    return (await res.json()) as {
+    return await res.json() as Promise<{
         value: {
             id: string;
             name: string;
@@ -23,6 +30,5 @@ export async function listRootChildren() {
             size: number;
             lastModifiedDateTime: string;
         }[];
-        "@odata.nextLink"?: string;          // 如需分页可继续请求
-    };
+    }>;
 }
