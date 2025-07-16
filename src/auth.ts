@@ -9,11 +9,11 @@ async function refreshAccessToken(refreshToken: string) {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-            client_id: process.env.MICROSOFT_CLIENT_ID!,
-            client_secret: process.env.MICROSOFT_CLIENT_SECRET!,
+            client_id: process.env.AUTH_MICROSOFT_ENTRA_ID_ID!,
+            client_secret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET!,
             grant_type: "refresh_token",
             refresh_token: refreshToken,
-            scope: "offline_access openid profile email User.Read",
+            scope: "offline_access openid profile email User.Read Files.ReadWrite",
         }),
     });
 
@@ -28,14 +28,14 @@ async function refreshAccessToken(refreshToken: string) {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     MicrosoftEntraID({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID!,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET!,
         issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
 
         /** 要拿到 refresh_token 必须声明 offline_access（Entra 规范） */
         authorization: {
             params: {
-                scope: "offline_access openid profile email User.Read",
+                scope: "offline_access openid profile email User.Read Files.ReadWrite",
             },
         },
     }),
