@@ -1,9 +1,9 @@
 // src/app/api/onedrive/list/route.ts
-import { listRootChildren } from "@/lib/onedrive";
+import { listChildren } from "@/lib/onedrive";
 
 export async function GET() {
     try {
-        const data = await listRootChildren();
+        const data = await listChildren();
         return Response.json(data);        // 200 OK
     } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
