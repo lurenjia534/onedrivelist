@@ -12,12 +12,12 @@ npm install
 Create a `.env.local` file at the project root and provide your Microsoft OAuth credentials:
 
 ```env
-MICROSOFT_CLIENT_ID=your-client-id
-MICROSOFT_CLIENT_SECRET=your-client-secret
+AUTH_MICROSOFT_ENTRA_ID_ID=your-client-id
+AUTH_MICROSOFT_ENTRA_ID_SECRET=your-client-secret
 AUTH_MICROSOFT_ENTRA_ID_ISSUER=https://login.microsoftonline.com/{tenant-id}/v2.0
 ```
 
-`MICROSOFT_CLIENT_ID` and `MICROSOFT_CLIENT_SECRET` can be obtained from Azure Portal. `AUTH_MICROSOFT_ENTRA_ID_ISSUER` should match the issuer URL for your tenant.
+`AUTH_MICROSOFT_ENTRA_ID_ID` and `AUTH_MICROSOFT_ENTRA_ID_SECRET` can be obtained from Azure Portal. `AUTH_MICROSOFT_ENTRA_ID_ISSUER` should match the issuer URL for your tenant.
 
 ### Register a Microsoft Entra ID application
 
