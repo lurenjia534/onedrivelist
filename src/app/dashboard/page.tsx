@@ -5,11 +5,12 @@ import { listChildren } from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import { SignOutButton } from "@/components/SignOutButton";
 
-interface DashboardProps {
-    searchParams?: { item?: string; path?: string };
-}
-
-export default async function DashboardPage({ searchParams }: DashboardProps) {
+/* ==== 关键修改：明确 searchParams 是 Promise<Record<string,string>> ==== */
+export default async function DashboardPage({
+                                                searchParams,
+                                            }: {
+    searchParams: Promise<Record<string, string>>;
+}) {
     const session = await auth();
     if (!session) redirect("/login");
 
@@ -42,7 +43,6 @@ export default async function DashboardPage({ searchParams }: DashboardProps) {
                 当前位置：<span className="font-normal">{currentPath}</span>
             </p>
 
-            {/* ⬇️ 把数据交给客户端组件渲染动画 */}
             <DriveList items={list.value} currentPath={currentPath} />
         </main>
     );
