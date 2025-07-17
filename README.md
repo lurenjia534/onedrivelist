@@ -28,7 +28,7 @@ This project was bootstrapped with `create-next-app`
 
 ## Getting Started
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+Follow these instructions to get a copy of the project up and running on your local machine.
 
 ### Prerequisites
 
@@ -52,13 +52,13 @@ npm install
 
 ### 3. Set up Microsoft Entra ID App
 
-To allow the application to authenticate with Microsoft, you need to register an application in the Microsoft Entra admin center (Azure AD).
+To allow the application to access your OneDrive, you need to register an application in the Microsoft Entra admin center (Azure AD).
 
 1.  Go to the [Microsoft Entra admin center](https://entra.microsoft.com/).
 2.  Navigate to **Identity > Applications > App registrations** and click **New registration**.
 3.  Give your application a name (e.g., `OneList App`).
 4.  Under **Supported account types**, select **Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)**.
-5.  Under **Redirect URI**, select **Web** and enter `http://localhost:3000/api/auth/callback/microsoft-entra-id`.
+5.  Under **Redirect URI**, select **Web** and enter a temporary URL, for example `http://localhost:3000/api/auth/callback/microsoft-entra-id`. This is only needed once to get the refresh token.
 6.  Click **Register**.
 
 ### 4. Configure Environment Variables
@@ -71,20 +71,46 @@ To allow the application to authenticate with Microsoft, you need to register an
     cp .env.example .env.local
     ```
 
-4.  Open `.env.local` and fill in the required values:
-
+4.  Open `.env.local` and fill in the following values:
     - `AUTH_MICROSOFT_ENTRA_ID_ID`: Your Application (client) ID.
     - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your client secret value.
-    - `AUTH_SECRET`: A new, strong secret you generate by running `openssl rand -base64 32` in your terminal.
-    - `AUTH_URL`: For local development, this is `http://localhost:3000`.
 
-### 5. Run the Development Server
+### 5. Obtain Your OneDrive Refresh Token
+
+This is a one-time step to grant the application permanent access to your OneDrive.
+
+1.  **Temporarily add Auth.js variables**: Open your `.env.local` and add these two temporary lines:
+    ```
+    AUTH_SECRET=any_random_string_for_now
+    AUTH_URL=http://localhost:3000
+    ```
+2.  **Temporarily expose the refresh token**: In the file `src/auth.ts`, temporarily add a `console.log` inside the `jwt` callback to print the refresh token when you log in:
+    ```typescript
+    // src/auth.ts
+    // ... inside the callbacks object
+    async jwt({token, account}) {
+        if (account) {
+            console.log("CAPTURE THIS REFRESH TOKEN:", account.refresh_token);
+            token.accessToken = account.access_token;
+            // ... rest of the function
+        }
+        // ...
+    }
+    ```
+3.  **Run the app and log in**: Start the development server (`npm run dev`). Open `http://localhost:3000`, and you will be prompted to log in. Complete the login with your Microsoft account.
+4.  **Copy the token**: Look at the terminal where you ran `npm run dev`. You will see a line that says `CAPTURE THIS REFRESH TOKEN:`. Copy the very long string that follows. This is your permanent refresh token.
+5.  **Set the permanent token**: Paste the copied refresh token into your `.env.local` file as the value for `ONEDRIVE_REFRESH_TOKEN`.
+6.  **Clean up**: You can now remove the temporary `console.log` from `src/auth.ts` and the temporary `AUTH_SECRET` and `AUTH_URL` variables from your `.env.local` file.
+
+### 6. Run the Development Server
+
+Now that the refresh token is set, you can run the application publicly.
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see your OneDrive files.
 
 ## Deployment on Vercel
 
@@ -92,8 +118,11 @@ This application is optimized for deployment on [Vercel](https://vercel.com/).
 
 1.  Push your code to a Git repository (e.g., on GitHub).
 2.  Import the repository into Vercel.
-3.  **Configure Environment Variables**: In your Vercel project settings (under **Settings > Environment Variables**), add all the variables from your `.env.local` file. **Crucially, you must update `AUTH_URL` to your production URL** (e.g., `https://your-project-name.vercel.app`).
-4.  Deploy! Vercel will automatically build and deploy your Next.js application.
+3.  **Configure Environment Variables**: In your Vercel project settings (under **Settings > Environment Variables**), add the three required variables from your `.env.local` file:
+    - `AUTH_MICROSOFT_ENTRA_ID_ID`
+    - `AUTH_MICROSOFT_ENTRA_ID_SECRET`
+    - `ONEDRIVE_REFRESH_TOKEN`
+4.  Deploy! Vercel will automatically build and deploy your Next.js application, which will now publicly display your OneDrive files without requiring any user login.
 
 ## License
 
