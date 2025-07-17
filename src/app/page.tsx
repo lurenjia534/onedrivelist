@@ -2,8 +2,12 @@
 import { listChildren } from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
+    if (!process.env.ONEDRIVE_REFRESH_TOKEN) {
+        redirect("/setup");
+    }
     try {
         const { value: items } = await listChildren();
         return (
@@ -14,6 +18,6 @@ export default async function Page() {
         );
     } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
-        return <p>Error: {message}</p>;
+        return <p className="text-red-600">无法读取 OneDrive 数据：{message}</p>;
     }
 }
