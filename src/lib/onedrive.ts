@@ -57,7 +57,7 @@ export async function listChildren(itemId?: string) {
     );
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    return res.json() as Promise<{
+    return await res.json() as Promise<{
         value: {
             id: string;
             name: string;
@@ -87,7 +87,7 @@ export async function getItem(itemId: string) {
     );
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    return res.json() as Promise<{
+    return await res.json() as Promise<{
         id: string;
         name: string;
         webUrl: string;
