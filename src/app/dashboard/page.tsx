@@ -4,21 +4,14 @@ import Image from "next/image";
 import { listChildren } from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import { SignOutButton } from "@/components/SignOutButton";
+import Link from "next/link";
 
-/* ==== 关键修改：明确 searchParams 是 Promise<Record<string,string>> ==== */
-export default async function DashboardPage({
-                                                searchParams,
-                                            }: {
-    searchParams: Promise<Record<string, string>>;
-}) {
+export default async function DashboardPage() {
     const session = await auth();
     if (!session) redirect("/login");
 
-    const params = (await searchParams) ?? {};
-    const currentItemId = params.item;
-    const currentPath = params.path ?? "根目录";
-
-    const list = await listChildren(currentItemId);
+    // 仪表盘页面现在总是显示根目录的内容
+    const list = await listChildren(); // 无参数调用，获取根目录
 
     return (
         <main className="p-8 max-w-5xl mx-auto font-extralight">
@@ -39,11 +32,12 @@ export default async function DashboardPage({
                 </div>
             </div>
 
+            {/* 面包屑导航 - 根目录 */}
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-                当前位置：<span className="font-normal">{currentPath}</span>
+                <Link href="/dashboard" className="hover:underline">根目录</Link>
             </p>
 
-            <DriveList items={list.value} currentPath={currentPath} />
+            <DriveList items={list.value} basePathSegments={[]} />
         </main>
     );
 }
