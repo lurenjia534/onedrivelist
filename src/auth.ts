@@ -76,14 +76,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
           return token;
       },
-        /** ③ 只把 access_token 暴露给浏览器，refresh_token 绝不外泄 */
-        // ③ **把 refreshToken 也暴露到 session**（仅测试环境！）
+        /**
+         * ③ 只把 access_token 暴露给浏览器，refresh_token 绝不外泄。
+         *    但在首次运行（环境变量未配置）时，需要把 refreshToken 暴露给 /token 页面。
+         */
         async session({ session, token }) {
             // 把 JWT 里的字段暴露给客户端
             session.accessToken = token.accessToken;
-            // if (token.error) session.error = token.error            // 可选
-            // session.refreshToken = token.refreshToken; // 仅在测试环境中开启，生产环境严禁暴露！！！
             session.expiresAt = token.expiresAt;
+            // 仅在未配置 Refresh Token 的情况下，临时暴露 refresh_token
+            if (!process.env.ONEDRIVE_REFRESH_TOKEN) {
+                session.refreshToken = token.refreshToken;
+            }
             return session;
         },
     },
