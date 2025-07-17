@@ -52,14 +52,25 @@ npm install
 
 ### 3. Set up Microsoft Entra ID App
 
-To allow the application to access your OneDrive, you need to register an application in the Microsoft Entra admin center (Azure AD).
+To get apps to access OneDrive, you need to register an app in the Microsoft Entra Admin Center:
 
-1.  Go to the [Microsoft Entra admin center](https://entra.microsoft.com/).
-2.  Navigate to **Identity > Applications > App registrations** and click **New registration**.
-3.  Give your application a name (e.g., `OneList App`).
-4.  Under **Supported account types**, select **Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)**.
-5.  Under **Redirect URI**, select **Web** and enter a temporary URL, for example `http://localhost:3000/api/auth/callback/microsoft-entra-id`. This is only needed once to get the refresh token.
-6.  Click **Register**.
+1. Enter [Microsoft Entra admin center](https://entra.microsoft.com/), select **Identity → Applications → App registrations**, and click **New registration**.
+2. Fill in the application name (such as *OneList App*) and select **Accounts in any organizational directory and personal Microsoft accounts**.
+3. After creation is completed, open the **Authentication** tab:
+    - Click **Add a platform → Web**.
+    - Add a redirect URI:
+        - Development environment: `http://localhost:3000/api/auth/callback/microsoft-entra-id`
+        - Production environment: `https://<your-vercel-domain>/api/auth/callback/microsoft-entra-id`
+        - If you need to obtain the Refresh Token at one time, you can temporarily add `http://localhost:3000/api/auth/callback/microsoft-entra-id` (can be deleted after completion).
+4. Click **New client secret** in **Certificates & secrets**, copy **Value** and save it properly.
+5. Open **API permissions**, add delegation permissions: `User.Read`, `Files.ReadWrite.All`, `offline_access`, and then click **Grant admin consent**.
+6. Return to the **Overview** page and copy the **Application (client) ID**. Determine `AUTH_MICROSOFT_ENTRA_ID_ISSUER` according to the tenant type:
+    - Multi-tenant + Personal account: `https://login.microsoftonline.com/common/v2.0`
+    - Single tenant: `https://login.microsoftonline.com/<your-tenant-id>/v2.0`
+    - Multi-tenant only: `https://login.microsoftonline.com/organizations/v2.0`
+    - Personal account only: `https://login.microsoftonline.com/consumers/v2.0`
+
+After completing the above steps, you can continue to configure environment variables and obtain OneDrive Refresh Token.
 
 ### 4. Configure Environment Variables
 
