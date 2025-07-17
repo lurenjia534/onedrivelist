@@ -10,11 +10,12 @@ import Link from "next/link";
 // 注意：在实际生产中，您可能需要一个更强大的 slug 到 name 的映射
 const decodeSegment = (segment: string) => decodeURIComponent(segment);
 
-export default async function FilesPage({ params }: { params: { slug?: string[] } }) {
+export default async function FilesPage({ params }: { params: Promise<{slug?: string[] }> }) {
     const session = await auth();
     if (!session) redirect("/login");
 
-    const slug = params.slug || [];
+    const  data  = await params;
+    const slug: string[] = data.slug ?? [];
     const currentItemId = slug.length > 0 ? slug[slug.length - 1] : undefined;
 
     const list = await listChildren(currentItemId);
