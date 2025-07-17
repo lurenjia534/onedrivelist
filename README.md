@@ -86,34 +86,24 @@ After completing the above steps, you can continue to configure environment vari
     - `AUTH_MICROSOFT_ENTRA_ID_ID`: Your Application (client) ID.
     - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your client secret value.
 
-### 5. Obtain Your OneDrive Refresh Token
+### 5. Generate Your OneDrive Refresh Token
 
-This is a one-time step to grant the application permanent access to your OneDrive.
+The first time you run the application it will enter **setup mode** automatically. 
+Follow these steps to obtain your permanent refresh token:
 
-1.  **Temporarily add Auth.js variables**: Open your `.env.local` and add these two temporary lines:
+1.  Start the development server:
+    ```bash
+    npm run dev
     ```
-    AUTH_SECRET=any_random_string_for_now
-    AUTH_URL=http://localhost:3000
-    ```
-2.  **Temporarily expose the refresh token**: In the file `src/auth.ts`, temporarily add a `console.log` inside the `jwt` callback to print the refresh token when you log in:
-    ```typescript
-    // src/auth.ts
-    // ... inside the callbacks object
-    async jwt({token, account}) {
-        if (account) {
-            console.log("CAPTURE THIS REFRESH TOKEN:", account.refresh_token);
-            token.accessToken = account.access_token;
-            // ... rest of the function
-        }
-        // ...
-    }
-    ```
-3.  **Run the app and log in**: Start the development server (`npm run dev`). Open `http://localhost:3000`, and you will be prompted to log in. Complete the login with your Microsoft account.
-4.  **Copy the token**: Look at the terminal where you ran `npm run dev`. You will see a line that says `CAPTURE THIS REFRESH TOKEN:`. Copy the very long string that follows. This is your permanent refresh token.
-5.  **Set the permanent token**: Paste the copied refresh token into your `.env.local` file as the value for `ONEDRIVE_REFRESH_TOKEN`.
-6.  **Clean up**: You can now remove the temporary `console.log` from `src/auth.ts` and the temporary `AUTH_SECRET` and `AUTH_URL` variables from your `.env.local` file.
+
+2.  Open `http://localhost:3000` in your browser. You will see a setup page with a "Login with Microsoft" button.
+3.  Click the button and complete the login. After authentication you will be redirected to `/token`, where your refresh token is displayed on screen.
+4.  Copy this token and paste it into your `.env.local` file as the value of `ONEDRIVE_REFRESH_TOKEN`.
+5.  Restart the development server. The app will now start in normal mode and display your OneDrive files.
 
 ### 6. Run the Development Server
+
+With `ONEDRIVE_REFRESH_TOKEN` set, run:
 
 Now that the refresh token is set, you can run the application publicly.
 
