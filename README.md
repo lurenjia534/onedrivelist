@@ -1,71 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-It demonstrates using **NextAuth.js** with Microsoft Entra ID for authentication.
+# OneList - A Next.js OneDrive File Browser
 
-## Setup
+![Login Page Screenshot](https://i.imgur.com/your-screenshot-url.png) <!-- Placeholder: Replace with an actual screenshot -->
 
-Install the dependencies first:
+OneList is a modern, open-source web application built with Next.js that allows you to browse and display files from a Microsoft OneDrive account. It features a clean, responsive interface, secure authentication, and shareable, persistent links to files and folders.
+
+This project was bootstrapped with `create-next-app` 
+
+## Features
+
+- **Secure Authentication**: Uses Auth.js (NextAuth.js) with the Microsoft Entra ID provider for robust and secure user login.
+- **Dynamic File Browsing**: Navigate through your OneDrive folders using a clean and intuitive interface.
+- **Persistent, Shareable Links**: Each folder has a unique URL (`/files/...`) that can be shared directly.
+- **Modern Tech Stack**: Built with the latest features of Next.js 15 (App Router), React 19, and TypeScript.
+- **Beautiful UI**: Styled with Tailwind CSS for a responsive and modern design.
+- **Smooth Animations**: Utilizes Framer Motion for fluid and engaging user interface animations.
+- **Iconography**: Crisp and clear icons provided by Lucide React.
+- **Vercel Ready**: Optimized for easy deployment on the Vercel platform.
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) 15
+- **Authentication**: [Auth.js (NextAuth.js)](https://authjs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+
+## Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v20.x or later recommended)
+- [Git](https://git-scm.com/)
+- A Microsoft Account with OneDrive storage.
+- An Azure Account to register the application for OAuth.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/onedrivelist.git
+cd onedrivelist
+```
+
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-Create a `.env.local` file at the project root and provide your Microsoft OAuth credentials:
+### 3. Set up Microsoft Entra ID App
 
-```env
-AUTH_MICROSOFT_ENTRA_ID_ID=your-client-id
-AUTH_MICROSOFT_ENTRA_ID_SECRET=your-client-secret
-AUTH_MICROSOFT_ENTRA_ID_ISSUER=https://login.microsoftonline.com/{tenant-id}/v2.0
-```
+To allow the application to authenticate with Microsoft, you need to register an application in the Microsoft Entra admin center (Azure AD).
 
-`AUTH_MICROSOFT_ENTRA_ID_ID` and `AUTH_MICROSOFT_ENTRA_ID_SECRET` can be obtained from Azure Portal. `AUTH_MICROSOFT_ENTRA_ID_ISSUER` should match the issuer URL for your tenant.
+1.  Go to the [Microsoft Entra admin center](https://entra.microsoft.com/).
+2.  Navigate to **Identity > Applications > App registrations** and click **New registration**.
+3.  Give your application a name (e.g., `OneList App`).
+4.  Under **Supported account types**, select **Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)**.
+5.  Under **Redirect URI**, select **Web** and enter `http://localhost:3000/api/auth/callback/microsoft-entra-id`.
+6.  Click **Register**.
 
-### Register a Microsoft Entra ID application
+### 4. Configure Environment Variables
 
-1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com/).
-2. Navigate to **Identity → Applications → App registrations** and choose **New registration**.
-3. Give the app a descriptive name such as *NextJS OneDrive Manager* and select **Accounts in any organizational directory and personal Microsoft accounts** for the supported account types.
-4. After creating the app, open the **Authentication** tab. Click **Add a platform**, choose **Web**, and add the exact redirect URIs:
-    - Development: `http://localhost:3000/api/auth/callback/microsoft-entra-id`
-    - Production: `https://<your-vercel-domain>/api/auth/callback/microsoft-entra-id`
-5. Under **Certificates & secrets**, create a **New client secret**. Copy the secret **Value** immediately because it is hidden after you leave the page.
-6. Open **API permissions** and add the delegated Microsoft Graph permissions `User.Read`, `Files.ReadWrite.All`, and `offline_access`. Then click **Grant admin consent**.
-7. From the **Overview** page copy the **Application (client) ID**. Determine your issuer URL for `AUTH_MICROSOFT_ENTRA_ID_ISSUER`:
-    - Multi-tenant + personal: `https://login.microsoftonline.com/common/v2.0`
-    - Single tenant: `https://login.microsoftonline.com/<your-tenant-id>/v2.0`
-    - Multi-tenant only: `https://login.microsoftonline.com/organizations/v2.0`
-    - Personal only: `https://login.microsoftonline.com/consumers/v2.0`
+1.  Once the app is registered, find and copy the **Application (client) ID**.
+2.  Go to the **Certificates & secrets** tab, create a **New client secret**, and copy its **Value** immediately (it will be hidden later).
+3.  Create a `.env.local` file in the root of your project by copying the example file:
 
-## Getting Started
+    ```bash
+    cp .env.example .env.local
+    ```
 
-First, run the development server:
+4.  Open `.env.local` and fill in the required values:
+
+    - `AUTH_MICROSOFT_ENTRA_ID_ID`: Your Application (client) ID.
+    - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your client secret value.
+    - `AUTH_SECRET`: A new, strong secret you generate by running `openssl rand -base64 32` in your terminal.
+    - `AUTH_URL`: For local development, this is `http://localhost:3000`.
+
+### 5. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment on Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This application is optimized for deployment on [Vercel](https://vercel.com/).
 
-## Learn More
+1.  Push your code to a Git repository (e.g., on GitHub).
+2.  Import the repository into Vercel.
+3.  **Configure Environment Variables**: In your Vercel project settings (under **Settings > Environment Variables**), add all the variables from your `.env.local` file. **Crucially, you must update `AUTH_URL` to your production URL** (e.g., `https://your-project-name.vercel.app`).
+4.  Deploy! Vercel will automatically build and deploy your Next.js application.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the `LICENSE` file for details.
