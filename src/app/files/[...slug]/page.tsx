@@ -1,20 +1,19 @@
 // src/app/files/[...slug]/page.tsx
-import { listChildren } from "@/lib/onedrive";
+import {listChildren} from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
-import Breadcrumbs, { generateBreadcrumbs } from "@/components/Breadcrumbs";
+import Breadcrumbs, {generateBreadcrumbs} from "@/components/Breadcrumbs";
 
-interface PageProps {
-    params: {
-        slug: string[];
-    };
-}
-
-export default async function Page({ params }: PageProps) {
-    const { slug } = params;
-    const itemId = slug[slug.length - 1]; // 最后一个 slug 是当前文件夹的 ID
+// Next 15: params 是一个 thenable，必须写成 Promise
+export default async function Page({
+                                       params,
+                                   }: {
+    params: Promise<{ slug?: string[] }>;
+}) {
+    const {slug = []} = await params;
+    const itemId = slug.at(-1);
 
     try {
-        const [{ value: items }, breadcrumbPath] = await Promise.all([
+        const [{value: items}, breadcrumbPath] = await Promise.all([
             listChildren(itemId),
             generateBreadcrumbs(slug),
         ]);
@@ -23,9 +22,9 @@ export default async function Page({ params }: PageProps) {
 
         return (
             <div className="container mx-auto p-4">
-                <Breadcrumbs path={breadcrumbPath} />
+                <Breadcrumbs path={breadcrumbPath}/>
                 <h1 className="text-2xl font-bold mb-4">{currentFolder?.name ?? "Files"}</h1>
-                <DriveList items={items} basePathSegments={slug} />
+                <DriveList items={items} basePathSegments={slug}/>
             </div>
         );
     } catch (e) {
