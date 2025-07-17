@@ -96,7 +96,11 @@ Follow these steps to obtain your permanent refresh token:
     npm run dev
     ```
 
-2.  Open `http://localhost:3000` in your browser. You will see a setup page with a "Login with Microsoft" button.
+2.  After the server starts:
+    - For local development: Open `http://localhost:3000` in your browser
+    - For Vercel deployment: Visit `https://<your-vercel-domain>`
+
+    You will see a setup page with a "Login with Microsoft" button.
 3.  Click the button and complete the login. After authentication you will be redirected to `/token`, where your refresh token is displayed on screen.
 4.  Copy this token and paste it into your `.env.local` file as the value of `ONEDRIVE_REFRESH_TOKEN`.
 5.  Restart the development server. The app will now start in normal mode and display your OneDrive files.
