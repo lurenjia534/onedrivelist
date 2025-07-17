@@ -3,6 +3,8 @@ import {listChildren} from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs, {generateBreadcrumbs} from "@/components/Breadcrumbs";
 
+export const revalidate = 600;
+
 // Next 15: params 是一个 thenable，必须写成 Promise
 export default async function Page({
                                        params,

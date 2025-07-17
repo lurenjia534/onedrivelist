@@ -4,6 +4,8 @@ import DriveList from "@/components/DriveList";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { redirect } from "next/navigation";
 
+export const revalidate = 600;
+
 export default async function Page() {
     if (!process.env.ONEDRIVE_REFRESH_TOKEN) {
         redirect("/setup");

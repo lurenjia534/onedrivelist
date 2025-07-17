@@ -1,6 +1,8 @@
 // src/app/api/onedrive/list/route.ts
 import { listChildren } from "@/lib/onedrive";
 
+export const revalidate = 600;
+
 export async function GET() {
     try {
         const data = await listChildren();

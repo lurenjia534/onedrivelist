@@ -6,10 +6,17 @@ const GRAPH = "https://graph.microsoft.com/v1.0";
  * 使用环境变量中的 Refresh Token 获取 Access Token。
  * 这是应用的核心认证机制，允许服务器代表管理员访问 OneDrive。
  */
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
 async function getAccessToken() {
     const refreshToken = process.env.ONEDRIVE_REFRESH_TOKEN;
     if (!refreshToken) {
         throw new Error("ONEDRIVE_REFRESH_TOKEN is not set in environment variables.");
+    }
+
+    const now = Date.now();
+    if (cachedToken && now < cachedToken.expiresAt - 5 * 60_000) {
+        return cachedToken.value;
     }
 
     // MS OAuth2 token endpoint
@@ -25,7 +32,7 @@ async function getAccessToken() {
             refresh_token: refreshToken,
             scope: "offline_access openid profile email User.Read Files.ReadWrite",
         }),
-        cache: "no-store",
+        next: { revalidate: 0 },
     });
 
     if (!res.ok) {
@@ -34,8 +41,12 @@ async function getAccessToken() {
         throw new Error(`Graph error ${res.status}: ${errorDetails.error_description}`);
     }
 
-    const tokenData = await res.json();
-    return tokenData.access_token as string;
+    const tokenData = await res.json() as { access_token: string; expires_in: number };
+    cachedToken = {
+        value: tokenData.access_token,
+        expiresAt: now + tokenData.expires_in * 1000,
+    };
+    return cachedToken.value;
 }
 
 /**
@@ -52,7 +63,7 @@ export async function listChildren(itemId?: string) {
         `${GRAPH}${endpoint}?$select=id,name,folder,file,webUrl,size,lastModifiedDateTime`,
         {
             headers: { Authorization: `Bearer ${accessToken}` },
-            cache: "no-store",
+            next: { revalidate: 600 },
         }
     );
 
@@ -82,7 +93,7 @@ export async function getItem(itemId: string) {
         `${GRAPH}${endpoint}?$select=id,name,webUrl`,
         {
             headers: { Authorization: `Bearer ${accessToken}` },
-            cache: "no-store",
+            next: { revalidate: 600 },
         }
     );
 
