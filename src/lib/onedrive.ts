@@ -104,3 +104,28 @@ export async function getItem(itemId: string) {
         webUrl: string;
     }>;
 }
+
+/**
+ * 获取文件的下载链接（@microsoft.graph.downloadUrl）。
+ * @param itemId 要下载的文件 ID。
+ */
+export async function getDownloadUrl(itemId: string) {
+    const accessToken = await getAccessToken();
+    const endpoint = `/me/drive/items/${itemId}/content`;
+
+    const res = await fetch(`${GRAPH}${endpoint}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        // 手动处理重定向以取得真实下载链接
+        redirect: "manual",
+        next: { revalidate: 0 },
+    });
+
+    if (res.status === 302) {
+        const url = res.headers.get("Location");
+        if (url) return url;
+    }
+
+    if (!res.ok) throw new Error(`Graph error ${res.status}`);
+    // 如果 fetch 自动跟随了重定向，返回最终的 URL
+    return res.url;
+}

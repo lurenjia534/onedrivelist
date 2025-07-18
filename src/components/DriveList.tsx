@@ -47,9 +47,7 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                             </Link>
                         ) : (
                             <a
-                                href={item.webUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={`/api/onedrive/download/${item.id}`}
                                 className="flex-1 truncate hover:underline cursor-pointer"
                             >
                                 {item.name}
