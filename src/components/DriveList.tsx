@@ -9,7 +9,9 @@ type Item = {
     name: string;
     webUrl: string;
     folder?: object;
-    file?: object;
+    file?: {
+        mimeType?: string;
+    };
     size: number;
 };
 
@@ -52,6 +54,16 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                             >
                                 {item.name}
                             </a>
+                        )}
+
+                        {/* 预览按钮，仅在图片文件时显示 */}
+                        {item.file?.mimeType?.startsWith("image/") && (
+                            <Link
+                                href={`/preview/${item.id}`}
+                                className="text-sm text-blue-600 dark:text-blue-400 hover:underline shrink-0"
+                            >
+                                预览
+                            </Link>
                         )}
 
                         {/* 大小 */}
