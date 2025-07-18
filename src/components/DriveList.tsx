@@ -20,6 +20,22 @@ interface DriveListProps {
     basePathSegments?: string[];
 }
 
+function formatSize(size: number): string {
+    const KB = 1024;
+    const MB = KB * 1024;
+    const GB = MB * 1024;
+
+    if (size >= GB) {
+        return `${(size / GB).toFixed(1)} GB`;
+    }
+
+    if (size >= MB) {
+        return `${(size / MB).toFixed(1)} MB`;
+    }
+
+    return `${(size / KB).toFixed(1)} KB`;
+}
+
 export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
     return (
         <ul className="space-y-2">
@@ -68,7 +84,7 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
 
                         {/* 大小 */}
                         <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
-                            {(item.size / 1024).toFixed(1)} KB
+                            {formatSize(item.size)}
                         </span>
                     </motion.li>
                 );
