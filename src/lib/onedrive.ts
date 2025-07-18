@@ -111,11 +111,27 @@ export async function getItem(itemId: string) {
  */
 export async function getDownloadUrl(itemId: string) {
     const accessToken = await getAccessToken();
-    const endpoint = `/me/drive/items/${itemId}/content`;
 
+    // 首先尝试直接获取 @microsoft.graph.downloadUrl 属性
+    const metaRes = await fetch(
+        `${GRAPH}/me/drive/items/${itemId}?$select=@microsoft.graph.downloadUrl`,
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            next: { revalidate: 0 },
+        },
+    );
+
+    if (metaRes.ok) {
+        const data = (await metaRes.json()) as { "@microsoft.graph.downloadUrl"?: string };
+        if (data["@microsoft.graph.downloadUrl"]) {
+            return data["@microsoft.graph.downloadUrl"] as string;
+        }
+    }
+
+    // 回退到 /content 接口
+    const endpoint = `/me/drive/items/${itemId}/content`;
     const res = await fetch(`${GRAPH}${endpoint}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
-        // 手动处理重定向以取得真实下载链接
         redirect: "manual",
         next: { revalidate: 0 },
     });
@@ -126,6 +142,5 @@ export async function getDownloadUrl(itemId: string) {
     }
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    // 如果 fetch 自动跟随了重定向，返回最终的 URL
     return res.url;
 }
