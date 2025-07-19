@@ -13,6 +13,7 @@ type Item = {
         mimeType?: string;
     };
     size: number;
+    lastModifiedDateTime: string;
 };
 
 interface DriveListProps {
@@ -34,6 +35,11 @@ function formatSize(size: number): string {
     }
 
     return `${(size / KB).toFixed(1)} KB`;
+}
+
+function formatDate(iso: string): string {
+    const d = new Date(iso);
+    return d.toLocaleDateString();
 }
 
 export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
@@ -85,6 +91,10 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                         {/* 大小 */}
                         <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
                             {formatSize(item.size)}
+                        </span>
+                        {/* 修改时间 */}
+                        <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+                            {formatDate(item.lastModifiedDateTime)}
                         </span>
                     </motion.li>
                 );

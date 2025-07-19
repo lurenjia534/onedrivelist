@@ -155,7 +155,7 @@ export async function searchItems(query: string) {
     const endpoint = `/me/drive/root/search(q='${encoded}')`;
 
     const res = await fetch(
-        `${GRAPH}${endpoint}?$select=id,name,folder,file,webUrl,size`,
+        `${GRAPH}${endpoint}?$select=id,name,folder,file,webUrl,size,lastModifiedDateTime`,
         {
             headers: { Authorization: `Bearer ${accessToken}` },
             next: { revalidate: 0 },
@@ -163,7 +163,7 @@ export async function searchItems(query: string) {
     );
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    return (await res.json()) as Promise<{
+    return (await res.json()) as {
         value: {
             id: string;
             name: string;
@@ -171,7 +171,8 @@ export async function searchItems(query: string) {
             folder?: object;
             file?: object;
             size: number;
+            lastModifiedDateTime: string;
         }[];
         "@odata.nextLink"?: string;
-    }>;
+    };
 }
