@@ -1,31 +1,40 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Cloud } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
 export default function Navbar() {
     return (
-        <header className="sticky top-0 z-50 border-b bg-white/70 dark:bg-gray-950/70 backdrop-blur">
-            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                <Link href="/" className="font-semibold hover:underline">OneList</Link>
+        <header className="sticky top-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md">
+            <div className="container mx-auto px-8 py-5 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-3 group">
+                    <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 p-1.5 rounded-lg"
+                    >
+                        <Cloud className="w-6 h-6" />
+                    </motion.div>
+
+                    <span className="text-xl font-medium text-black dark:text-white group-hover:opacity-80 transition-opacity">OneDriveList</span>
+                </Link>
                 <motion.form
                     action="/search"
-                    className="flex items-center gap-2 max-w-md"
+                    className="flex items-center gap-3 max-w-md w-full"
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
                     <input
                         type="text"
                         name="q"
-                        placeholder="Search files..."
-                        className="flex-1 px-3 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                        placeholder="搜索文件..."
+                        className="flex-1 px-5 py-2.5 rounded-xl bg-gray-50/50 dark:bg-gray-900/50 focus:outline-none text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                     />
                     <motion.button
                         type="submit"
                         whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="p-2 bg-blue-600 text-white rounded-full"
+                        whileTap={{ scale: 0.9 }}
+                        className="p-2.5 bg-black text-white dark:bg-white dark:text-black rounded-xl hover:opacity-90 transition-opacity focus:outline-none"
                     >
                         <Search className="w-4 h-4" />
                         <span className="sr-only">Search</span>
