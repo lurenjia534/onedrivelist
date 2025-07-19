@@ -4,7 +4,7 @@ import { Folder, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-type Item = {
+export type Item = {
     id: string;
     name: string;
     webUrl: string;
