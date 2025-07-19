@@ -144,3 +144,34 @@ export async function getDownloadUrl(itemId: string) {
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
     return res.url;
 }
+
+/**
+ * Search drive items using Microsoft Graph search API.
+ * @param query Search keyword.
+ */
+export async function searchItems(query: string) {
+    const accessToken = await getAccessToken();
+    const encoded = encodeURIComponent(query);
+    const endpoint = `/me/drive/root/search(q='${encoded}')`;
+
+    const res = await fetch(
+        `${GRAPH}${endpoint}?$select=id,name,folder,file,webUrl,size`,
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            next: { revalidate: 0 },
+        }
+    );
+
+    if (!res.ok) throw new Error(`Graph error ${res.status}`);
+    return (await res.json()) as Promise<{
+        value: {
+            id: string;
+            name: string;
+            webUrl: string;
+            folder?: object;
+            file?: object;
+            size: number;
+        }[];
+        "@odata.nextLink"?: string;
+    }>;
+}
