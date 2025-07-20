@@ -1,6 +1,15 @@
 "use client";
 
-import { Folder, FileText } from "lucide-react";
+import {
+    Folder,
+    FileText,
+    FileImage,
+    FileVideo,
+    FileAudio,
+    FileSpreadsheet,
+    Files, Presentation, FileType2, FileArchive, FileCode,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -42,6 +51,29 @@ function formatDate(iso: string): string {
     return d.toLocaleDateString();
 }
 
+function getExtension(name: string): string {
+    const idx = name.lastIndexOf(".");
+    return idx !== -1 ? name.slice(idx + 1).toLowerCase() : "";
+}
+
+function getIconByExtension(ext: string): LucideIcon {
+    if (["txt", "md", "rtf", "odt"].includes(ext)) return FileText;
+    if (["xls", "xlsx", "xlsb", "xlsm", "csv", "tsv"].includes(ext)) return FileSpreadsheet;
+    if (["doc", "docx"].includes(ext)) return FileText;
+    if (["ppt", "pptx", "key", "odp"].includes(ext)) return Presentation;  // 或 FileType
+    if (["pdf"].includes(ext)) return FileType2;
+    if (["mp4", "mkv", "mov", "avi", "wmv", "webm", "flv", "mpeg", "mpg"].includes(ext)) return FileVideo;
+    if (["mp3", "wav", "flac", "aac", "ogg", "m4a"].includes(ext)) return FileAudio;
+    if (["jpg", "jpeg", "png", "svg", "gif", "bmp", "webp", "tiff"].includes(ext)) return FileImage;
+    if (["zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "iso"].includes(ext)) return FileArchive;
+    if (["js", "jsx", "ts", "tsx", "json", "yml", "yaml", "py", "rb", "go", "rs", "php", "java", "c", "cpp", "h", "hpp", "css", "scss", "html", "sh", "mdx"].includes(ext)) return FileCode;
+    return Files; // 默认
+}
+
+function getFileIcon(name: string): LucideIcon {
+    return getIconByExtension(getExtension(name));
+}
+
 export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
     return (
         <ul className="space-y-2">
@@ -49,6 +81,8 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                 // 构建新的动态路径
                 const newPathSegments = [...basePathSegments, item.id];
                 const href = `/files/${newPathSegments.join('/')}`;
+
+                const Icon = item.folder ? Folder : getFileIcon(item.name);
 
                 return (
                     <motion.li
@@ -61,7 +95,7 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                     >
                         {/* 图标 */}
                         <span className="text-black dark:text-white opacity-70 group-hover:opacity-100 transition-opacity shrink-0 bg-gray-100 dark:bg-gray-900 p-2 rounded-lg">
-                            {item.folder ? <Folder size={20} /> : <FileText size={20} />}
+                            <Icon size={20} />
                         </span>
 
                         {/* 名称（可点击） */}
