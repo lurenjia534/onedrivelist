@@ -14,14 +14,14 @@ interface BreadcrumbsProps {
 
 export default function Breadcrumbs({ path }: BreadcrumbsProps) {
     return (
-        <nav className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
-            <Link href="/" className="hover:underline">主页</Link>
+        <nav className="flex items-center text-sm mb-10 overflow-x-auto">
+            <Link href="/" className="text-black dark:text-white opacity-70 hover:opacity-100 transition-opacity font-medium px-2 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10">主页</Link>
             {path.map((segment, index) => {
                 const href = `/files/${path.slice(0, index + 1).map(s => s.id).join('/')}`;
                 return (
                     <div key={segment.id} className="flex items-center">
-                        <ChevronRight size={16} className="mx-1" />
-                        <Link href={href} className="hover:underline">{segment.name}</Link>
+                        <ChevronRight size={16} className="mx-1 text-black/30 dark:text-white/30" />
+                        <Link href={href} className="text-black dark:text-white opacity-70 hover:opacity-100 transition-opacity font-medium px-2 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 whitespace-nowrap">{segment.name}</Link>
                     </div>
                 );
             })}
