@@ -1,6 +1,6 @@
 # OneList - A Next.js OneDrive File Browser
 
-![Login Page Screenshot](https://i.imgur.com/your-screenshot-url.png) <!-- Placeholder: Replace with an actual screenshot -->
+![Login Page Screenshot](image/Login.png) <!-- Placeholder: Replace with an actual screenshot -->
 
 OneList is a modern, open-source web application built with Next.js that allows you to browse and display files from a Microsoft OneDrive account. It features a clean, responsive interface, secure authentication, and shareable, persistent links to files and folders.
 
