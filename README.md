@@ -74,17 +74,19 @@ After completing the above steps, you can continue to configure environment vari
 
 ### 4. Configure Environment Variables
 
-1.  Once the app is registered, find and copy the **Application (client) ID**.
-2.  Go to the **Certificates & secrets** tab, create a **New client secret**, and copy its **Value** immediately (it will be hidden later).
-3.  Create a `.env.local` file in the root of your project by copying the example file:
+1.  Create a `.env.local` file in the root of your project by copying the example file:
 
     ```bash
     cp .env.example .env.local
     ```
 
-4.  Open `.env.local` and fill in the following values:
-    - `AUTH_MICROSOFT_ENTRA_ID_ID`: Your Application (client) ID.
-    - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your client secret value.
+2.  Open `.env.local` and fill in the following values:
+    - `AUTH_URL`: Base URL of your application—used for callbacks and redirects
+    - `AUTH_SECRET`: A secret string used to sign tokens. Generate one using `openssl rand -base64 32` in your terminal.
+    - `AUTH_MICROSOFT_ENTRA_ID_ID`: Your **Application (client) ID** from the Entra App Registration.
+    - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your **client secret value** from the Entra App Registration.
+    - `AUTH_MICROSOFT_ENTRA_ID_ISSUER`: The issuer URL from the Entra App Registration (e.g., `https://login.microsoftonline.com/common/v2.0`).
+    - `ONEDRIVE_REFRESH_TOKEN`: **Leave this blank for now.** You will obtain it in the next step.
 
 ### 5. Generate Your OneDrive Refresh Token
 
@@ -102,7 +104,7 @@ Follow these steps to obtain your permanent refresh token:
 
     You will see a setup page with a "Login with Microsoft" button.
 3.  Click the button and complete the login. After authentication you will be redirected to `/token`, where your refresh token is displayed on screen.
-4.  Copy this token and paste it into your `.env.local` file as the value of `ONEDRIVE_REFRESH_TOKEN`.
+4.  Copy this token. Go to your Vercel project dashboard, navigate to **Settings > Environment Variables**, and add it as `ONEDRIVE_REFRESH_TOKEN`.
 5.  Restart the development server. The app will now start in normal mode and display your OneDrive files.
 
 ### 6. Run the Development Server
@@ -123,9 +125,12 @@ This application is optimized for deployment on [Vercel](https://vercel.com/).
 
 1.  Push your code to a Git repository (e.g., on GitHub).
 2.  Import the repository into Vercel.
-3.  **Configure Environment Variables**: In your Vercel project settings (under **Settings > Environment Variables**), add the three required variables from your `.env.local` file:
+3.  **Configure Environment Variables**: In your Vercel project settings (under **Settings > Environment Variables**), add all the required variables from your `.env.local` file:
+4.  - `AUTH_URL`
+    - `AUTH_SECRET`
     - `AUTH_MICROSOFT_ENTRA_ID_ID`
     - `AUTH_MICROSOFT_ENTRA_ID_SECRET`
+    - `AUTH_MICROSOFT_ENTRA_ID_ISSUER`
     - `ONEDRIVE_REFRESH_TOKEN`
 4.  Deploy! Vercel will automatically build and deploy your Next.js application, which will now publicly display your OneDrive files without requiring any user login.
 
