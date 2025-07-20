@@ -7,6 +7,8 @@ OneList is a modern, open-source web application built with Next.js that allows 
 
 This project was bootstrapped using `create-next-app`.
 
+[Demo](https://list.lurenapp.uk/)
+
 ## Features
 
 - **Secure Authentication**: Uses Auth.js (NextAuth.js) with the Microsoft Entra ID provider for robust and secure user login.
