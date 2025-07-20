@@ -1,6 +1,6 @@
 // src/components/Breadcrumbs.tsx
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import {ChevronRight, Home} from "lucide-react";
 import { getItem } from "@/lib/onedrive";
 
 type PathSegment = {
@@ -15,7 +15,10 @@ interface BreadcrumbsProps {
 export default function Breadcrumbs({ path }: BreadcrumbsProps) {
     return (
         <nav className="flex items-center text-sm mb-10 overflow-x-auto">
-            <Link href="/" className="text-black dark:text-white opacity-70 hover:opacity-100 transition-opacity font-medium px-2 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10">主页</Link>
+            <Link href="/" className="text-black dark:text-white opacity-70 hover:opacity-100 transition-opacity font-medium px-2 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 leading-none">
+                <Home size={16} className="shrink-0 relative -top-[1px]"/>
+                主页
+            </Link>
             {path.map((segment, index) => {
                 const href = `/files/${path.slice(0, index + 1).map(s => s.id).join('/')}`;
                 return (
