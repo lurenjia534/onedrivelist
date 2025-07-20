@@ -74,6 +74,24 @@ function getFileIcon(name: string): LucideIcon {
     return getIconByExtension(getExtension(name));
 }
 
+function isImageFile(item: Item): boolean {
+    const ext = getExtension(item.name);
+    const imageExts = [
+        "jpg",
+        "jpeg",
+        "png",
+        "svg",
+        "gif",
+        "bmp",
+        "webp",
+        "tiff",
+    ];
+    return (
+        !!item.file &&
+        (item.file.mimeType?.startsWith("image/") || imageExts.includes(ext))
+    );
+}
+
 export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
     return (
         <ul className="space-y-2">
@@ -113,10 +131,10 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                         )}
 
                         {/* 预览按钮，仅在图片文件时显示 */}
-                        {item.file?.mimeType?.startsWith("image/") && (
+                        {isImageFile(item) && (
                             <Link
                                 href={`/preview/${item.id}`}
-                                className="hidden sm:inline-flex text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
+                                className="inline-flex text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
                             >
                                 预览
                             </Link>
