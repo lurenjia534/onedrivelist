@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function Navbar() {
     return (
         <header className="sticky top-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md">
-            <div className="container mx-auto px-8 py-5 flex items-center justify-between">
+            <div className="container mx-auto px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-0 sm:justify-between">
                 <Link href="/" className="flex items-center gap-3 group">
                     <motion.div
                         whileHover={{ scale: 1.1 }}
@@ -20,7 +20,7 @@ export default function Navbar() {
                 </Link>
                 <motion.form
                     action="/search"
-                    className="flex items-center gap-3 max-w-md w-full"
+                    className="flex items-center gap-3 w-full sm:max-w-md"
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                 >

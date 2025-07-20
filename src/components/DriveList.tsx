@@ -91,7 +91,7 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.04 }}
                         whileHover={{ scale: 1.01, x: 4 }}
-                        className="flex items-center gap-4 px-5 py-4 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group"
+                        className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-4 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group"
                     >
                         {/* 图标 */}
                         <span className="text-black dark:text-white opacity-70 group-hover:opacity-100 transition-opacity shrink-0 bg-gray-100 dark:bg-gray-900 p-2 rounded-lg">
@@ -116,20 +116,20 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                         {item.file?.mimeType?.startsWith("image/") && (
                             <Link
                                 href={`/preview/${item.id}`}
-                                className="text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
+                                className="hidden sm:inline-flex text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
                             >
                                 预览
                             </Link>
                         )}
 
-                        {/* 大小 */}
-                        <span className="text-sm text-black/50 dark:text-white/50 shrink-0 group-hover:text-black dark:group-hover:text-white transition-colors">
-                            {formatSize(item.size)}
-                        </span>
-                        {/* 修改时间 */}
-                        <span className="text-sm text-black/50 dark:text-white/50 shrink-0 min-w-24 text-right group-hover:text-black dark:group-hover:text-white transition-colors">
-                            {formatDate(item.lastModifiedDateTime)}
-                        </span>
+                        <div className="flex w-full justify-between sm:w-auto sm:ml-auto gap-4 text-sm text-black/50 dark:text-white/50">
+                            <span className="group-hover:text-black dark:group-hover:text-white transition-colors">
+                                {formatSize(item.size)}
+                            </span>
+                            <span className="min-w-24 text-right group-hover:text-black dark:group-hover:text-white transition-colors">
+                                {formatDate(item.lastModifiedDateTime)}
+                            </span>
+                        </div>
                     </motion.li>
                 );
             })}
