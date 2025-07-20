@@ -1,4 +1,4 @@
-# OneList - A Next.js OneDrive File Browser
+# OneList - A Next.js OneDrive File Page
 
 ![Login Page Screenshot](image/Login.png)
 ![File Page Screenshot](image/file.png)
