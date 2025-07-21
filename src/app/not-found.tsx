@@ -156,7 +156,7 @@ export default function NotFound() {
                 className="absolute bottom-8 left-0 right-0 text-center"
             >
                 <p className="text-xs text-gray-400">
-                    © 2025 OneDriveList. All rights reserved.
+                    © {new Date().getFullYear()} OneDriveList.
                 </p>
             </motion.div>
         </div>
