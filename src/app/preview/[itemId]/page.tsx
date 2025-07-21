@@ -1,6 +1,11 @@
-import {getItem, getDownloadUrl} from "@/lib/onedrive";
+import { getItem, getDownloadUrl } from "@/lib/onedrive";
 
 export const revalidate = 0;
+
+function getExtension(name: string): string {
+    const idx = name.lastIndexOf(".");
+    return idx !== -1 ? name.slice(idx + 1).toLowerCase() : "";
+}
 
 export default async function PreviewPage({
     params,
@@ -11,6 +16,20 @@ export default async function PreviewPage({
             getItem(itemId),
             getDownloadUrl(itemId),
         ]);
+
+        const ext = getExtension(item.name);
+        if (ext === "txt") {
+            const res = await fetch(url);
+            const text = await res.text();
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
+                    <pre className="whitespace-pre-wrap bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                        {text}
+                    </pre>
+                </div>
+            );
+        }
 
         return (
             <div className="container mx-auto p-4">
