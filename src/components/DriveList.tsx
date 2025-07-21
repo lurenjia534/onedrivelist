@@ -109,7 +109,7 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.04 }}
                         whileHover={{ scale: 1.01, x: 4 }}
-                        className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-4 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group"
+                        className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-3 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group"
                     >
                         {/* 图标 */}
                         <span className="text-black dark:text-white opacity-70 group-hover:opacity-100 transition-opacity shrink-0 bg-gray-100 dark:bg-gray-900 p-2 rounded-lg">
@@ -140,11 +140,11 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                             </Link>
                         )}
 
-                        <div className="flex w-full justify-between sm:w-auto sm:ml-auto gap-4 text-sm text-black/50 dark:text-white/50">
+                        <div className="flex flex-col sm:flex-row w-full sm:w-auto sm:ml-auto gap-0.5 sm:gap-4 text-sm text-black/50 dark:text-white/50">
                             <span className="group-hover:text-black dark:group-hover:text-white transition-colors">
                                 {formatSize(item.size)}
                             </span>
-                            <span className="min-w-24 text-right group-hover:text-black dark:group-hover:text-white transition-colors">
+                            <span className="sm:text-right group-hover:text-black dark:group-hover:text-white transition-colors">
                                 {formatDate(item.lastModifiedDateTime)}
                             </span>
                         </div>
