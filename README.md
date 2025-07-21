@@ -14,6 +14,7 @@ This project was bootstrapped using `create-next-app`.
 - **Secure Authentication**: Uses Auth.js (NextAuth.js) with the Microsoft Entra ID provider for robust and secure user login.
 - **Dynamic File Browsing**: Navigate through your OneDrive folders using a clean and intuitive interface.
 - **Persistent, Shareable Links**: Each folder has a unique URL (`/files/...`) that can be shared directly.
+- **File Previews**: View images, text files, and audio directly in the browser.
 - **Modern Tech Stack**: Built with the latest features of Next.js 15 (App Router), React 19, and TypeScript.
 - **Beautiful UI**: Styled with Tailwind CSS for a responsive and modern design.
 - **Smooth Animations**: Utilizes Framer Motion for fluid and engaging user interface animations.

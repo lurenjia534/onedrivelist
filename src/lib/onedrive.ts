@@ -90,7 +90,7 @@ export async function getItem(itemId: string) {
     const endpoint = `/me/drive/items/${itemId}`;
 
     const res = await fetch(
-        `${GRAPH}${endpoint}?$select=id,name,webUrl`,
+        `${GRAPH}${endpoint}?$select=id,name,webUrl,file`,
         {
             headers: { Authorization: `Bearer ${accessToken}` },
             next: { revalidate: 600 },
@@ -102,6 +102,9 @@ export async function getItem(itemId: string) {
         id: string;
         name: string;
         webUrl: string;
+        file?: {
+            mimeType?: string;
+        };
     }>;
 }
 

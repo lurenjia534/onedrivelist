@@ -31,6 +31,15 @@ export default async function PreviewPage({
             );
         }
 
+        if (["mp3", "wav", "flac", "aac", "ogg", "m4a"].includes(ext)) {
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
+                    <audio controls src={url} className="w-full" />
+                </div>
+            );
+        }
+
         return (
             <div className="container mx-auto p-4">
                 <h1 className="text-2xl font-bold mb-4">{item.name}</h1>

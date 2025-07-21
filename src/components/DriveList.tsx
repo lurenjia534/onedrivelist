@@ -100,6 +100,15 @@ function isTextFile(item: Item): boolean {
     );
 }
 
+function isAudioFile(item: Item): boolean {
+    const ext = getExtension(item.name);
+    const audioExts = ["mp3", "wav", "flac", "aac", "ogg", "m4a"];
+    return (
+        !!item.file &&
+        (item.file.mimeType?.startsWith("audio/") || audioExts.includes(ext))
+    );
+}
+
 export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
     return (
         <ul className="space-y-2">
@@ -138,8 +147,8 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                             </a>
                         )}
 
-                        {/* 预览按钮，图片和文本文件可预览 */}
-                        {(isImageFile(item) || isTextFile(item)) && (
+                        {/* 预览按钮，图片、文本及音频文件可预览 */}
+                        {(isImageFile(item) || isTextFile(item) || isAudioFile(item)) && (
                             <Link
                                 href={`/preview/${item.id}`}
                                 className="inline-flex text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
