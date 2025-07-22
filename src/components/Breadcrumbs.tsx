@@ -37,16 +37,14 @@ export default function Breadcrumbs({ path }: BreadcrumbsProps) {
  * @param slug ID 数组，来自 URL。
  */
 export async function generateBreadcrumbs(slug: string[]): Promise<PathSegment[]> {
-    const path: PathSegment[] = [];
-    for (const id of slug) {
-        try {
-            const item = await getItem(id);
-            path.push({ id: item.id, name: item.name });
-        } catch (error) {
-            console.error(`Failed to fetch item ${id} for breadcrumbs:`, error);
-            // 如果某个 ID 无效，可以跳过或显示一个错误名称
-            path.push({ id, name: "[未知文件夹]" });
-        }
-    }
-    return path;
+    const fetches = slug.map(id =>
+        getItem(id)
+            .then(item => ({ id: item.id, name: item.name }))
+            .catch(error => {
+                console.error(`Failed to fetch item ${id} for breadcrumbs:`, error);
+                return { id, name: "[未知文件夹]" };
+            })
+    );
+
+    return Promise.all(fetches);
 }
