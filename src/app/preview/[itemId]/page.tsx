@@ -1,13 +1,15 @@
 import { getItem, getDownloadUrl } from "@/lib/onedrive";
+import {
+    getExtension,
+    isAudioExtension,
+    isTextExtension,
+    isMarkdownExtension,
+} from "@/lib/fileTypes";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export const revalidate = 0;
 
-function getExtension(name: string): string {
-    const idx = name.lastIndexOf(".");
-    return idx !== -1 ? name.slice(idx + 1).toLowerCase() : "";
-}
 
 export default async function PreviewPage({
     params,
@@ -20,21 +22,7 @@ export default async function PreviewPage({
         ]);
 
         const ext = getExtension(item.name);
-        const isMarkdown = item.file?.mimeType === "text/markdown" || ["md", "markdown"].includes(ext);
-        if (isMarkdown) {
-            const res = await fetch(url);
-            const text = await res.text();
-            return (
-                <div className="container mx-auto p-4">
-                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
-                    <article className="prose dark:prose-invert max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
-                    </article>
-                </div>
-            );
-        }
-
-        if (ext === "txt") {
+        if (isTextExtension(ext)) {
             const res = await fetch(url);
             const text = await res.text();
             return (
@@ -47,7 +35,22 @@ export default async function PreviewPage({
             );
         }
 
-        if (["mp3", "wav", "flac", "aac", "ogg", "m4a"].includes(ext)) {
+        if (isMarkdownExtension(ext)) {
+            const res = await fetch(url);
+            const md = await res.text();
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
+                    <div className="prose dark:prose-invert">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {md}
+                        </ReactMarkdown>
+                    </div>
+                </div>
+            );
+        }
+
+        if (isAudioExtension(ext)) {
             return (
                 <div className="container mx-auto p-4">
                     <h1 className="text-2xl font-bold mb-4">{item.name}</h1>

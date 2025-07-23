@@ -7,11 +7,22 @@ import {
     FileVideo,
     FileAudio,
     FileSpreadsheet,
-    Files, Presentation, FileType2, FileArchive, FileCode,
+    Files,
+    Presentation,
+    FileType2,
+    FileArchive,
+    FileCode,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import {
+    getExtension,
+    isAudioExtension,
+    isImageExtension,
+    isTextExtension,
+    isMarkdownExtension,
+} from "@/lib/fileTypes";
 
 export type Item = {
     id: string;
@@ -51,20 +62,16 @@ function formatDate(iso: string): string {
     return d.toLocaleDateString();
 }
 
-function getExtension(name: string): string {
-    const idx = name.lastIndexOf(".");
-    return idx !== -1 ? name.slice(idx + 1).toLowerCase() : "";
-}
 
 function getIconByExtension(ext: string): LucideIcon {
-    if (["txt", "md", "rtf", "odt"].includes(ext)) return FileText;
+    if (isTextExtension(ext) || isMarkdownExtension(ext)) return FileText;
     if (["xls", "xlsx", "xlsb", "xlsm", "csv", "tsv"].includes(ext)) return FileSpreadsheet;
     if (["doc", "docx"].includes(ext)) return FileText;
     if (["ppt", "pptx", "key", "odp"].includes(ext)) return Presentation;  // 或 FileType
     if (["pdf"].includes(ext)) return FileType2;
     if (["mp4", "mkv", "mov", "avi", "wmv", "webm", "flv", "mpeg", "mpg"].includes(ext)) return FileVideo;
-    if (["mp3", "wav", "flac", "aac", "ogg", "m4a"].includes(ext)) return FileAudio;
-    if (["jpg", "jpeg", "png", "svg", "gif", "bmp", "webp", "tiff"].includes(ext)) return FileImage;
+    if (isAudioExtension(ext)) return FileAudio;
+    if (isImageExtension(ext)) return FileImage;
     if (["zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "iso"].includes(ext)) return FileArchive;
     if (["js", "jsx", "ts", "tsx", "json", "yml", "yaml", "py", "rb", "go", "rs", "php", "java", "c", "cpp", "h", "hpp", "css", "scss", "html", "sh", "mdx"].includes(ext)) return FileCode;
     return Files; // 默认
@@ -76,19 +83,9 @@ function getFileIcon(name: string): LucideIcon {
 
 function isImageFile(item: Item): boolean {
     const ext = getExtension(item.name);
-    const imageExts = [
-        "jpg",
-        "jpeg",
-        "png",
-        "svg",
-        "gif",
-        "bmp",
-        "webp",
-        "tiff",
-    ];
     return (
         !!item.file &&
-        (item.file.mimeType?.startsWith("image/") || imageExts.includes(ext))
+        (item.file.mimeType?.startsWith("image/") || isImageExtension(ext))
     );
 }
 
@@ -96,16 +93,15 @@ function isTextFile(item: Item): boolean {
     const ext = getExtension(item.name);
     return (
         !!item.file &&
-        (item.file.mimeType?.startsWith("text/") || ext === "txt")
+        (item.file.mimeType?.startsWith("text/") || isTextExtension(ext) || isMarkdownExtension(ext))
     );
 }
 
 function isAudioFile(item: Item): boolean {
     const ext = getExtension(item.name);
-    const audioExts = ["mp3", "wav", "flac", "aac", "ogg", "m4a"];
     return (
         !!item.file &&
-        (item.file.mimeType?.startsWith("audio/") || audioExts.includes(ext))
+        (item.file.mimeType?.startsWith("audio/") || isAudioExtension(ext))
     );
 }
 
