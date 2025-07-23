@@ -1,4 +1,6 @@
 import { getItem, getDownloadUrl } from "@/lib/onedrive";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const revalidate = 0;
 
@@ -18,6 +20,20 @@ export default async function PreviewPage({
         ]);
 
         const ext = getExtension(item.name);
+        const isMarkdown = item.file?.mimeType === "text/markdown" || ["md", "markdown"].includes(ext);
+        if (isMarkdown) {
+            const res = await fetch(url);
+            const text = await res.text();
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
+                    <article className="prose dark:prose-invert max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+                    </article>
+                </div>
+            );
+        }
+
         if (ext === "txt") {
             const res = await fetch(url);
             const text = await res.text();
