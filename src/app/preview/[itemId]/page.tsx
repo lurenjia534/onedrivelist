@@ -5,6 +5,7 @@ import {
     isTextExtension,
     isMarkdownExtension,
 } from "@/lib/fileTypes";
+import AudioPlayer from "@/components/AudioPlayer";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -52,9 +53,14 @@ export default async function PreviewPage({
 
         if (isAudioExtension(ext)) {
             return (
-                <div className="container mx-auto p-4">
-                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
-                    <audio controls src={url} className="w-full" />
+                <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                    {/* 标题放上方，留出更多间距 */}
+                    <h1 className="text-2xl font-bold mb-6 text-center max-w-xl">{item.name}</h1>
+
+                    {/* 限定播放器最大宽度，避免大屏过宽 */}
+                    <div className="w-full max-w-xl">
+                        <AudioPlayer src={url} />
+                    </div>
                 </div>
             );
         }
