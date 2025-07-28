@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useRef, useState} from "react";
-import {Play, Pause, Volume2, VolumeX, Loader2, SkipBack, SkipForward} from "lucide-react";
+import {Play, Pause, Loader2, SkipBack, SkipForward} from "lucide-react";
 import {motion, AnimatePresence} from "framer-motion";
 
 // Generate stable waveform data outside component
@@ -15,10 +15,7 @@ export default function AudioPlayer({src}: { src: string }) {
     const [playing, setPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(1);
-    const [previousVolume, setPreviousVolume] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [hovering, setHovering] = useState(false);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -72,27 +69,6 @@ export default function AudioPlayer({src}: { src: string }) {
         setProgress(value);
     };
 
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        const value = Number(e.target.value);
-        audio.volume = value;
-        setVolume(value);
-        if (value > 0) setPreviousVolume(value);
-    };
-
-    const toggleMute = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        if (volume > 0) {
-            setPreviousVolume(volume);
-            audio.volume = 0;
-            setVolume(0);
-        } else {
-            audio.volume = previousVolume;
-            setVolume(previousVolume);
-        }
-    };
 
     const skip = (seconds: number) => {
         const audio = audioRef.current;
@@ -105,8 +81,6 @@ export default function AudioPlayer({src}: { src: string }) {
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 0.5}}
-            onHoverStart={() => setHovering(true)}
-            onHoverEnd={() => setHovering(false)}
             className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-black p-8 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 backdrop-blur-xl"
         >
             <audio ref={audioRef} src={src} className="hidden"/>
@@ -254,52 +228,6 @@ export default function AudioPlayer({src}: { src: string }) {
                     </motion.button>
                 </div>
 
-                {/* Volume Control */}
-                <motion.div
-                    initial={{opacity: 0}}
-                    animate={{opacity: hovering ? 1 : 0}}
-                    transition={{duration: 0.2}}
-                    className="flex items-center gap-3 justify-center"
-                >
-                    <motion.button
-                        whileHover={{scale: 1.1}}
-                        whileTap={{scale: 0.9}}
-                        onClick={toggleMute}
-                        className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-                    >
-                        {volume === 0 ? <VolumeX className="w-5 h-5"/> : <Volume2 className="w-5 h-5"/>}
-                    </motion.button>
-
-                    <div className="relative w-32 h-8 flex items-center">
-                        <div
-                            className="absolute inset-y-0 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-gradient-to-r from-gray-400 to-gray-600 dark:from-gray-600 dark:to-gray-400"
-                                style={{width: `${volume * 100}%`}}
-                            />
-                        </div>
-                        <input
-                            type="range"
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            value={volume}
-                            onChange={handleVolumeChange}
-                            className="relative w-full h-full opacity-0 cursor-pointer z-10"
-                        />
-                        <motion.div
-                            className="absolute bg-white dark:bg-gray-900 border-2 border-gray-600 dark:border-gray-400 rounded-full shadow-lg"
-                            style={{
-                                left: `${volume * 100}%`,
-                                width: '16px',
-                                height: '16px',
-                                x: '-50%',
-                            }}
-                            whileHover={{scale: 1.2}}
-                            whileTap={{scale: 0.9}}
-                        />
-                    </div>
-                </motion.div>
             </div>
         </motion.div>
     );
