@@ -7,6 +7,7 @@ import {
 } from "@/lib/fileTypes";
 import AudioPlayer from "@/components/AudioPlayer";
 import TextPreview from "@/components/TextPreview";
+import ImagePreview from "@/components/ImagePreview";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -67,12 +68,7 @@ export default async function PreviewPage({
         return (
             <div className="container mx-auto p-4">
                 <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    src={url}
-                    alt={item.name}
-                    className="max-w-full h-auto mx-auto border"
-                />
+                <ImagePreview src={url} alt={item.name} />
             </div>
         );
     } catch (e) {
