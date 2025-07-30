@@ -8,11 +8,18 @@ export default function CopyButton({ text }: { text: string }) {
     const [copied, setCopied] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    /* ⭐ 将函数改为 async，并显式等待 Promise ⭐ */
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(text);   // 等待复制完成
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            // 在这里可以给用户一个错误提示，也可以上报日志
+            console.error("复制失败：", err);
+        }
     };
+
 
     return (
         <motion.button 
