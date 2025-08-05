@@ -12,6 +12,7 @@ This project was bootstrapped using `create-next-app`.
 ## Features
 
 - **Secure Authentication**: Uses Auth.js (NextAuth.js) with the Microsoft Entra ID provider for robust and secure user login.
+- **Optional Password Protection**: Require a password before accessing the site when configured.
 - **Dynamic File Browsing**: Navigate through your OneDrive folders using a clean and intuitive interface.
 - **Persistent, Shareable Links**: Each folder has a unique URL (`/files/...`) that can be shared directly.
 - **File Previews**: View images, text files, and audio directly in the browser.
@@ -91,6 +92,13 @@ After completing the above steps, you can continue to configure environment vari
     - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your **client secret value** from the Entra App Registration.
     - `AUTH_MICROSOFT_ENTRA_ID_ISSUER`: The issuer URL from the Entra App Registration (e.g., `https://login.microsoftonline.com/common/v2.0`).
     - `ONEDRIVE_REFRESH_TOKEN`: **Leave this blank for now.** You will obtain it in the next step.
+    - `password` (optional): Adds a simple access password. When set, visitors must first visit `/login` and enter this value.
+
+      Example in `.env.local`:
+
+      ```env
+      password=<your-password>
+      ```
 
 ### 5. Generate Your OneDrive Refresh Token
 
@@ -136,6 +144,7 @@ This application is optimized for deployment on [Vercel](https://vercel.com/).
     - `AUTH_MICROSOFT_ENTRA_ID_SECRET`
     - `AUTH_MICROSOFT_ENTRA_ID_ISSUER`
     - `ONEDRIVE_REFRESH_TOKEN`
+    - `password` (optional)
 4.  Deploy! Vercel will automatically build and deploy your Next.js application, which will now publicly display your OneDrive files without requiring any user login.
 
 ## License
