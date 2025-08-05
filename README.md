@@ -7,6 +7,9 @@ OneList is a modern, open-source web application built with Next.js that allows 
 
 This project was bootstrapped using `create-next-app`.
 
+demo enable password
+password is ```123456```
+
 [Demo](https://list.lurenapp.uk/)
 
 ## Features
