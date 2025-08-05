@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LogIn, AlertCircle } from "lucide-react";
+import { Lock, LogIn, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 
@@ -37,11 +37,12 @@ export default function LoginUI({
           {/* Image Section */}
           <div className="w-full md:w-1/2">
             <Image
-              src="/Login.png"
+              src="/loginback.png"
               alt="Login Banner"
               width={1024}
               height={1024}
               className="object-cover w-full h-full"
+              unoptimized
             />
           </div>
 
@@ -51,8 +52,18 @@ export default function LoginUI({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="mb-6"
+              className="mb-6 flex flex-col items-center gap-3"
             >
+              {/* Animated Lock icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
+                className="bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white p-3 rounded-full shadow-lg"
+              >
+                <Lock className="w-8 h-8" />
+              </motion.div>
+
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white">OneDriveList</h1>
             </motion.div>
 
@@ -106,14 +117,14 @@ export default function LoginUI({
                   type="password"
                   required
                   placeholder="请输入管理员密码"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition-all text-lg"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:border-transparent outline-none transition-all text-lg"
                 />
               </div>
 
               <motion.button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-full hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 shadow-lg flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed text-lg"
+                className="w-full bg-black text-white font-bold py-3 px-4 rounded-full hover:bg-black/90 active:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black dark:focus:ring-offset-gray-900 shadow-lg flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed text-lg"
                 whileHover={{ scale: isLoading ? 1 : 1.05 }}
                 whileTap={{ scale: isLoading ? 1 : 0.95 }}
               >
