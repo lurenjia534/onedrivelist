@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import LoginUI from "./login-ui";
 
 export default function LoginPage() {
     if (!process.env.password) {
@@ -14,24 +15,8 @@ export default function LoginPage() {
             cookieStore.set("pwd-auth", String(input), { httpOnly: true });
             redirect("/");
         }
+        return { error: "密码错误，请重试" };
     }
 
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <form action={login} className="space-y-4">
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    className="border px-4 py-2"
-                />
-                <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-500 text-white"
-                >
-                    Login
-                </button>
-            </form>
-        </div>
-    );
+    return <LoginUI loginAction={login} />;
 }
