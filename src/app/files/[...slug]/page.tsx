@@ -1,5 +1,5 @@
 // src/app/files/[...slug]/page.tsx
-import {listChildren} from "@/lib/onedrive";
+import {getDriveType, listChildren} from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs, {generateBreadcrumbs} from "@/components/Breadcrumbs";
 
@@ -15,7 +15,8 @@ export default async function Page({
     const itemId = slug.at(-1);
 
     try {
-        const [{value: items}, breadcrumbPath] = await Promise.all([
+        const [driveType, {value: items}, breadcrumbPath] = await Promise.all([
+            getDriveType(),
             listChildren(itemId),
             generateBreadcrumbs(slug),
         ]);
@@ -25,6 +26,9 @@ export default async function Page({
         return (
             <div className="container mx-auto p-4">
                 <Breadcrumbs path={breadcrumbPath}/>
+                <div className="text-center mb-4">
+                    {driveType === "personal" ? "OneDrive 个人版" : "OneDrive for Business"}
+                </div>
                 <h1 className="text-2xl font-bold mb-4">{currentFolder?.name ?? "Files"}</h1>
                 <DriveList items={items} basePathSegments={slug}/>
             </div>

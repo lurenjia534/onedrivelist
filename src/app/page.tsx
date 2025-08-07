@@ -1,5 +1,5 @@
 // src/app/page.tsx
-import { listChildren } from "@/lib/onedrive";
+import { getDriveType, listChildren } from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { redirect } from "next/navigation";
@@ -11,10 +11,16 @@ export default async function Page() {
         redirect("/setup");
     }
     try {
-        const { value: items } = await listChildren();
+        const [driveType, { value: items }] = await Promise.all([
+            getDriveType(),
+            listChildren(),
+        ]);
         return (
             <div className="container mx-auto p-4">
                 <Breadcrumbs path={[]} />
+                <div className="text-center mb-4">
+                    {driveType === "personal" ? "OneDrive 个人版" : "OneDrive for Business"}
+                </div>
                 <DriveList items={items} />
             </div>
         );

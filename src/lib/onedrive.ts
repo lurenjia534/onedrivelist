@@ -82,6 +82,25 @@ export async function listChildren(itemId?: string) {
 }
 
 /**
+ * 获取当前 Drive 的类型（个人版或企业版）。
+ * 使用 /me/drive?$select=driveType 接口获取 driveType 字段。
+ */
+export async function getDriveType() {
+    const accessToken = await getAccessToken();
+    const res = await fetch(
+        `${GRAPH}/me/drive?$select=driveType`,
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            next: { revalidate: 600 },
+        }
+    );
+
+    if (!res.ok) throw new Error(`Graph error ${res.status}`);
+    const data = (await res.json()) as { driveType: "personal" | "business" };
+    return data.driveType;
+}
+
+/**
  * 获取单个 DriveItem 的元数据。
  * @param itemId 要获取其元数据的文件或文件夹的 ID。
  */
