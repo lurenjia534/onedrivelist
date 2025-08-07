@@ -15,7 +15,7 @@ export default async function Page({
     const itemId = slug.at(-1);
 
     try {
-        const [driveType, {value: items}, breadcrumbPath] = await Promise.all([
+        const [, {value: items}, breadcrumbPath] = await Promise.all([
             getDriveType(),
             listChildren(itemId),
             generateBreadcrumbs(slug),
@@ -26,13 +26,6 @@ export default async function Page({
         return (
             <div className="container mx-auto p-4">
                 <Breadcrumbs path={breadcrumbPath} />
-                <div className="mb-4 flex justify-center">
-                    <span
-                        className="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
-                    >
-                        {driveType === "personal" ? "OneDrive 个人版" : "OneDrive for Business"}
-                    </span>
-                </div>
                 <h1 className="text-2xl font-bold mb-4">{currentFolder?.name ?? "Files"}</h1>
                 <DriveList items={items} basePathSegments={slug} />
             </div>

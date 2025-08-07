@@ -18,14 +18,14 @@ export default async function Page() {
         return (
             <div className="container mx-auto p-4">
                 <Breadcrumbs path={[]} />
+                <DriveList items={items} />
                 <div className="mb-4 flex justify-center">
                     <span
                         className="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
                     >
-                        {driveType === "personal" ? "OneDrive 个人版" : "OneDrive for Business"}
+                        {driveType === "personal" ? "OneDrive Personal drive" : "OneDrive for Business drive"}
                     </span>
                 </div>
-                <DriveList items={items} />
             </div>
         );
     } catch (e) {
