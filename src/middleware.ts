@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthToken } from "@/lib/authToken";
 
-export function middleware(req: NextRequest) {
-    const password = process.env.password;
-    if (!password) {
+export async function middleware(req: NextRequest) {
+    const token = await getAuthToken();
+    if (!token) {
         return NextResponse.next();
     }
 
@@ -13,7 +14,7 @@ export function middleware(req: NextRequest) {
     }
 
     const cookie = req.cookies.get("pwd-auth");
-    if (cookie && cookie.value === password) {
+    if (cookie && cookie.value === token) {
         return NextResponse.next();
     }
 

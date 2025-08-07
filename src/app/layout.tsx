@@ -4,6 +4,7 @@ import "./globals.css";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
+import { getAuthToken } from "@/lib/authToken";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,10 +26,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const password = process.env.password;
+  const token = await getAuthToken();
   const cookieStore = await cookies();
-  const authed = !password ||
-    cookieStore.get("pwd-auth")?.value === password;
+  const authed = !token ||
+    cookieStore.get("pwd-auth")?.value === token;
   return (
     <html lang="en">
       <body
