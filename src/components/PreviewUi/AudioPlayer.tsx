@@ -11,7 +11,7 @@ export default function AudioPlayer({ src }: { src: string }) {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Reset when source changes
+  // Reset when a source changes
   useEffect(() => {
     setReady(false);
     setPlaying(false);
