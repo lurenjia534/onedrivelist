@@ -3,8 +3,10 @@ import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { LogIn } from "lucide-react";
 import { useState } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export default function LoginButton() {
+    const { t } = useI18n();
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -20,7 +22,7 @@ export default function LoginButton() {
                 animate={isHovered ? { x: -5 } : { x: 0 }}
                 transition={{ type: "spring", stiffness: 300 }}
             >
-                安全登录 Microsoft 账户
+                {t("setup.login.button")}
             </motion.span>
             <motion.div
                 animate={isHovered ? { x: 5, rotate: 10 } : { x: 0, rotate: 0 }}

@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Home, RefreshCw, Cloud, AlertCircle, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export default function NotFound() {
+    const { t } = useI18n();
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -64,14 +66,14 @@ export default function NotFound() {
                     >
                         <div className="flex items-center justify-center gap-2 text-gray-500 mb-4">
                             <AlertCircle className="w-5 h-5" />
-                            <span className="text-sm font-medium uppercase tracking-wider">页面未找到</span>
+                            <span className="text-sm font-medium uppercase tracking-wider">{t("notfound.badge")}</span>
                         </div>
                         
                         <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                            看起来您迷路了
+                            {t("notfound.title")}
                         </h2>
                         <p className="text-lg text-gray-600 max-w-md mx-auto">
-                            您访问的页面不存在或已被移动。让我们帮您找到正确的方向。
+                            {t("notfound.desc")}
                         </p>
                     </motion.div>
 
@@ -88,7 +90,7 @@ export default function NotFound() {
                                 className="group relative inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl"
                             >
                                 <Home className="w-4 h-4" />
-                                <span>返回首页</span>
+                                <span>{t("notfound.home")}</span>
                                 <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                             </Link>
 
@@ -97,7 +99,7 @@ export default function NotFound() {
                                 className="group inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-all duration-200"
                             >
                                 <RefreshCw className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500" />
-                                <span>刷新页面</span>
+                                <span>{t("notfound.refresh")}</span>
                             </button>
                         </div>
 
@@ -108,13 +110,12 @@ export default function NotFound() {
                             className="pt-8"
                         >
                             <p className="text-sm text-gray-500">
-                                需要帮助？
+                                {t("notfound.help")} 
                                 <Link href="/" className="text-gray-900 hover:underline ml-1">
-                                    查看文档
+                                    {t("notfound.docs")}
                                 </Link>
-                                或
                                 <Link href="/" className="text-gray-900 hover:underline ml-1">
-                                    联系支持
+                                    {t("notfound.contact")}
                                 </Link>
                             </p>
                         </motion.div>

@@ -16,6 +16,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useI18n } from "@/i18n/I18nProvider";
 import {
     getExtension,
     isAudioExtension,
@@ -111,6 +112,7 @@ function isMarkdownFile(item: Item): boolean {
 }
 
 export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
+    const { t } = useI18n();
     return (
         <ul className="space-y-2">
             {items.map((item, idx) => {
@@ -157,7 +159,7 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                                 href={`/preview/${item.id}`}
                                 className="inline-flex text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
                             >
-                                预览
+                                {t("preview")}
                             </Link>
                         )}
 

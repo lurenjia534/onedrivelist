@@ -4,13 +4,15 @@ import { motion } from "framer-motion";
 import { LockKeyhole } from "lucide-react";
 import LoginButton from "./login-button";
 import Head from "next/head";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export default function SetupUI() {
+    const { t } = useI18n();
     return (
         <div className="flex items-center justify-center min-h-screen px-4 bg-gray-100 dark:bg-gray-900">
             <Head>
-                <title>OneDriveList - 首次运行设置</title>
-                <meta name="description" content="OneDriveList 首次运行设置页面" />
+                <title>{t("setup.head.title")}</title>
+                <meta name="description" content={t("setup.head.description")} />
             </Head>
             <div className="w-full max-w-md">
                 <div className="text-center mb-6">
@@ -39,7 +41,7 @@ export default function SetupUI() {
                             transition={{ delay: 0.3 }}
                             className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
                         >
-                            首次运行设置
+                            {t("setup.title")}
                         </motion.h1>
 
                         <motion.div
@@ -48,8 +50,8 @@ export default function SetupUI() {
                             transition={{ delay: 0.4 }}
                             className="text-gray-500 dark:text-gray-400 mt-2"
                         >
-                            尚未检测到 <code className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded-md text-gray-800 dark:text-gray-200">ONEDRIVE_REFRESH_TOKEN</code> 环境变量。
-                            <p className="mt-2">请登录您的 Microsoft 账号以生成 Refresh Token。</p>
+                            {t("setup.missing", { token: "ONEDRIVE_REFRESH_TOKEN" })}
+                            <p className="mt-2">{t("setup.instruction")}</p>
                         </motion.div>
                     </div>
 

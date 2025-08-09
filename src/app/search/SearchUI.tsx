@@ -12,6 +12,7 @@ import {
   isMarkdownExtension,
   isTextExtension,
 } from "@/lib/fileTypes";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type SortKey = "relevance" | "date_desc" | "date_asc" | "name_asc" | "size_desc" | "size_asc";
 type FilterKey = "all" | "folders" | "files" | "images" | "audio" | "text" | "markdown" | "video" | "archives" | "code" | "docs" | "sheets";
@@ -67,6 +68,7 @@ function sortItems(items: Item[], sort: SortKey): Item[] {
 }
 
 export default function SearchUI() {
+  const { t } = useI18n();
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -141,14 +143,14 @@ export default function SearchUI() {
             <input
               value={query}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="搜索文件或文件夹..."
+              placeholder={t("search.input.placeholder")}
               className="w-full pl-9 pr-3 py-2 rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/40 text-sm outline-none focus:ring-2 focus:ring-blue-500/40"
             />
           </div>
           {loading && (
             <span className="inline-flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
               <Loader2 className="w-4 h-4 animate-spin" />
-              搜索中
+              {t("search.loading")}
             </span>
           )}
         </div>
@@ -156,13 +158,13 @@ export default function SearchUI() {
         {/* Filters & sort */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {([
-            ["all", "全部"],
-            ["folders", "文件夹"],
-            ["files", "文件"],
-            ["images", "图片"],
-            ["audio", "音频"],
-            ["text", "文本"],
-            ["markdown", "Markdown"],
+            ["all", t("filter.all")],
+            ["folders", t("filter.folders")],
+            ["files", t("filter.files")],
+            ["images", t("filter.images")],
+            ["audio", t("filter.audio")],
+            ["text", t("filter.text")],
+            ["markdown", t("filter.markdown")],
           ] as [FilterKey, string][]).map(([key, label]) => (
             <button
               key={key}
@@ -178,18 +180,18 @@ export default function SearchUI() {
           ))}
 
           <div className="ml-auto inline-flex items-center gap-2 text-sm">
-            <label className="text-black/60 dark:text-white/60">排序</label>
+            <label className="text-black/60 dark:text-white/60">{t("sort.label")}</label>
             <select
               className="px-2 py-1 rounded-lg bg-transparent border border-black/10 dark:border-white/10"
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
             >
-              <option value="date_desc">最近修改</option>
-              <option value="date_asc">最早修改</option>
-              <option value="name_asc">名称 A → Z</option>
-              <option value="size_desc">大小 从大到小</option>
-              <option value="size_asc">大小 从小到大</option>
-              <option value="relevance">相关性（原顺序）</option>
+              <option value="date_desc">{t("sort.date_desc")}</option>
+              <option value="date_asc">{t("sort.date_asc")}</option>
+              <option value="name_asc">{t("sort.name_asc")}</option>
+              <option value="size_desc">{t("sort.size_desc")}</option>
+              <option value="size_asc">{t("sort.size_asc")}</option>
+              <option value="relevance">{t("sort.relevance")}</option>
             </select>
           </div>
         </div>
@@ -199,9 +201,9 @@ export default function SearchUI() {
           {error ? (
             <p className="text-red-600">Error: {error}</p>
           ) : query.trim() === "" ? (
-            <p className="text-black/60 dark:text-white/60">请输入搜索关键字。</p>
+            <p className="text-black/60 dark:text-white/60">{t("search.tip.enter")}</p>
           ) : items && items.length === 0 ? (
-            <p className="text-black/60 dark:text-white/60">没有找到匹配的结果。</p>
+            <p className="text-black/60 dark:text-white/60">{t("search.tip.none")}</p>
           ) : items ? (
             <SearchResults items={displayed} query={query.trim()} />
           ) : null}

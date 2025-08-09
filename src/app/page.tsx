@@ -3,6 +3,9 @@ import { getDriveType, listChildren } from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import zh from "@/i18n/dictionaries/zh";
+import en from "@/i18n/dictionaries/en";
 
 export const revalidate = 600;
 
@@ -11,6 +14,9 @@ export default async function Page() {
         redirect("/setup");
     }
     try {
+        const cookieStore = await cookies();
+        const locale = cookieStore.get("lang")?.value === "en" ? "en" : "zh";
+        const dict = locale === "zh" ? zh : en;
         const [driveType, { value: items }] = await Promise.all([
             getDriveType(),
             listChildren(),
@@ -23,13 +29,17 @@ export default async function Page() {
                     <span
                         className="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
                     >
-                        {driveType === "personal" ? "OneDrive Personal drive" : "OneDrive for Business drive"}
+                        {driveType === "personal" ? dict["drive.personal"] : dict["drive.business"]}
                     </span>
                 </div>
             </div>
         );
     } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
-        return <p className="text-red-600">无法读取 OneDrive 数据：{message}</p>;
+        const cookieStore = await cookies();
+        const locale = cookieStore.get("lang")?.value === "en" ? "en" : "zh";
+        const dict = locale === "zh" ? zh : en;
+        const text = (dict["error.onedrive"] ?? "Error: {message}").replace("{message}", message);
+        return <p className="text-red-600">{text}</p>;
     }
 }

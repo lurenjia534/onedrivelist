@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import { Lock, LogIn, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export default function LoginUI({
   loginAction,
 }: {
   loginAction: (formData: FormData) => Promise<{ error?: string } | undefined>;
 }) {
+  const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,8 +25,8 @@ export default function LoginUI({
         setError(result.error);
       }
     } catch (error: unknown) {
-      console.error("登录失败:", error);
-      setError("登录过程中发生错误");
+      console.error("login failed:", error);
+      setError(t("login.error.generic"));
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +76,7 @@ export default function LoginUI({
                 transition={{ delay: 0.3 }}
                 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white"
               >
-                账户登录
+                {t("login.heading")}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -82,7 +84,7 @@ export default function LoginUI({
                 transition={{ delay: 0.4 }}
                 className="text-gray-500 dark:text-gray-400 mt-2"
               >
-                请输入管理员密码以访问
+                {t("login.subtitle")}
               </motion.p>
             </div>
 
@@ -109,14 +111,14 @@ export default function LoginUI({
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  密码
+                  {t("login.password.label")}
                 </label>
                 <input
                   id="password"
                   name="password"
                   type="password"
                   required
-                  placeholder="请输入管理员密码"
+                  placeholder={t("login.password.placeholder")}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:border-transparent outline-none transition-all text-lg"
                 />
               </div>
@@ -141,7 +143,7 @@ export default function LoginUI({
                 ) : (
                   <>
                     <LogIn size={22} />
-                    <span>登录</span>
+                    <span>{t("login.button")}</span>
                   </>
                 )}
               </motion.button>
