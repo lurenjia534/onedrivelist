@@ -65,6 +65,17 @@ const en = {
   "notfound.help": "Need help?",
   "notfound.docs": "View docs",
   "notfound.contact": "Contact support",
+
+  // Token
+  "token.success": "Refresh Token acquired",
+  "token.failure": "Failed to acquire Refresh Token",
+  "token.success.instruction": "Copy the Refresh Token below and set {token} in your deployment environment variables.",
+  "token.failure.instruction": "Could not get the Refresh Token. Go back and try again.",
+  "token.back": "Go Back and Retry",
+
+  // Copy
+  "copy.copied": "Copied",
+  "copy.copy": "Copy",
 };
 
 export default en;

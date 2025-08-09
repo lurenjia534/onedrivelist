@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Copy } from "lucide-react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export default function CopyButton({ text }: { text: string }) {
+    const { t } = useI18n();
     const [copied, setCopied] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
@@ -40,7 +42,7 @@ export default function CopyButton({ text }: { text: string }) {
                         className="flex items-center space-x-1"
                     >
                         <Check size={14} />
-                        <span>已复制</span>
+                        <span>{t("copy.copied")}</span>
                     </motion.div>
                 ) : (
                     <motion.div 
@@ -56,7 +58,7 @@ export default function CopyButton({ text }: { text: string }) {
                         >
                             <Copy size={14} />
                         </motion.div>
-                        <span>复制</span>
+                        <span>{t("copy.copy")}</span>
                     </motion.div>
                 )}
             </AnimatePresence>

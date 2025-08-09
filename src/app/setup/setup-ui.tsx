@@ -5,6 +5,7 @@ import { LockKeyhole } from "lucide-react";
 import LoginButton from "./login-button";
 import Head from "next/head";
 import { useI18n } from "@/i18n/I18nProvider";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function SetupUI() {
     const { t } = useI18n();
@@ -15,6 +16,7 @@ export default function SetupUI() {
                 <meta name="description" content={t("setup.head.description")} />
             </Head>
             <div className="w-full max-w-md">
+                <div className="flex justify-end mb-4"><LanguageSwitcher /></div>
                 <div className="text-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">OneDriveList</h1>
                 </div>

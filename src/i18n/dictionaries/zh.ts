@@ -65,6 +65,17 @@ const zh = {
   "notfound.help": "需要帮助？",
   "notfound.docs": "查看文档",
   "notfound.contact": "联系支持",
+
+  // Token
+  "token.success": "获取 Refresh Token 成功",
+  "token.failure": "获取 Refresh Token 失败",
+  "token.success.instruction": "请复制下面的 Refresh Token，并在部署平台的环境变量中设置 {token}",
+  "token.failure.instruction": "未能获取到 Refresh Token，请返回重试。",
+  "token.back": "返回重试",
+
+  // Copy
+  "copy.copied": "已复制",
+  "copy.copy": "复制",
 };
 
 export default zh;

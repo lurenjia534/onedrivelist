@@ -3,11 +3,15 @@
 import { CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import CopyButton from "./copy-button";
 import { motion } from "framer-motion";
+import { useI18n } from "@/i18n/I18nProvider";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function TokenUI({ token }: { token: string | undefined }) {
+    const { t } = useI18n();
     return (
         <div className="flex items-center justify-center min-h-screen px-4 bg-gray-100 dark:bg-gray-900">
             <div className="w-full max-w-md">
+                <div className="flex justify-end mb-4"><LanguageSwitcher /></div>
                 <motion.div 
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -55,7 +59,7 @@ export default function TokenUI({ token }: { token: string | undefined }) {
                             transition={{ delay: 0.3 }}
                             className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
                         >
-                            {token ? "获取 Refresh Token 成功" : "获取 Refresh Token 失败"}
+                            {token ? t("token.success") : t("token.failure")}
                         </motion.h1>
 
                         {token ? (
@@ -65,7 +69,7 @@ export default function TokenUI({ token }: { token: string | undefined }) {
                                 transition={{ delay: 0.4 }}
                                 className="text-gray-500 dark:text-gray-400 mt-2"
                             >
-                                请复制下面的 Refresh Token，并在部署平台的环境变量中设置 <code className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded-md text-gray-800 dark:text-gray-200">ONEDRIVE_REFRESH_TOKEN</code>
+                                {t("token.success.instruction", { token: "ONEDRIVE_REFRESH_TOKEN" })}
                             </motion.p>
                         ) : (
                             <motion.p 
@@ -74,7 +78,7 @@ export default function TokenUI({ token }: { token: string | undefined }) {
                                 transition={{ delay: 0.4 }}
                                 className="text-gray-500 dark:text-gray-400 mt-2"
                             >
-                                未能获取到 Refresh Token，请返回重试。
+                                {t("token.failure.instruction")}
                             </motion.p>
                         )}
                     </div>
@@ -112,7 +116,7 @@ export default function TokenUI({ token }: { token: string | undefined }) {
                                 >
                                     <ArrowLeft size={18} />
                                 </motion.div>
-                                <span>返回重试</span>
+                                <span>{t("token.back")}</span>
                             </motion.a>
                         </motion.div>
                     )}
