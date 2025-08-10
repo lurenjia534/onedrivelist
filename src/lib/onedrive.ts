@@ -68,7 +68,7 @@ export async function listChildren(itemId?: string) {
     );
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    return await res.json() as Promise<{
+    return await res.json() as {
         value: {
             id: string;
             name: string;
@@ -78,7 +78,7 @@ export async function listChildren(itemId?: string) {
             size: number;
             lastModifiedDateTime: string;
         }[];
-    }>;
+    };
 }
 
 /**
@@ -117,14 +117,14 @@ export async function getItem(itemId: string) {
     );
 
     if (!res.ok) throw new Error(`Graph error ${res.status}`);
-    return await res.json() as Promise<{
+    return await res.json() as {
         id: string;
         name: string;
         webUrl: string;
         file?: {
             mimeType?: string;
         };
-    }>;
+    };
 }
 
 /**
