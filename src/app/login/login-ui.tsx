@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Lock, LogIn, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import Image from "next/image";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -37,21 +36,9 @@ export default function LoginUI({
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto p-4">
         <div className="flex justify-end mb-4"><LanguageSwitcher /></div>
-        <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto overflow-hidden rounded-2xl shadow-2xl bg-white dark:bg-gray-800">
-          {/* Image Section */}
-          <div className="w-full md:w-1/2">
-            <Image
-              src="/loginback.png"
-              alt="Login Banner"
-              width={1024}
-              height={1024}
-              className="object-cover w-full h-full"
-              unoptimized
-            />
-          </div>
-
+        <div className="w-full max-w-lg mx-auto overflow-hidden rounded-2xl shadow-2xl bg-white dark:bg-gray-800 p-8 md:p-12 flex flex-col justify-center">
           {/* Form Section */}
-          <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+          <div className="flex flex-col justify-center">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
