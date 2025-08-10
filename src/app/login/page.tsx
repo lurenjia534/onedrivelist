@@ -19,7 +19,12 @@ export default function LoginPage() {
         if (input && input === process.env.password) {
             const token = await getAuthToken();
             if (token) {
-                cookieStore.set("pwd-auth", token, { httpOnly: true });
+                cookieStore.set("pwd-auth", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "lax",
+                    path: "/",
+                });
                 redirect("/");
             }
         }
