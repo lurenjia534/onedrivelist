@@ -24,6 +24,7 @@ password is ```123456```
 - **Smooth Animations**: Utilizes Framer Motion for fluid and engaging user interface animations.
 - **Iconography**: Crisp and clear icons provided by Lucide React.
 - **Vercel Ready**: Optimized for easy deployment on the Vercel platform.
+- **Support i18n**
 
 ## Tech Stack
 
