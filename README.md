@@ -41,7 +41,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v20.x or later recommended)
+- [Node.js](https://nodejs.org/) (v22.x or latest lts)
 - [Git](https://git-scm.com/)
 - A Microsoft Account with OneDrive storage.
 - An Azure Account to register the application for OAuth.
