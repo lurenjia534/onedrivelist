@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { LockKeyhole } from "lucide-react";
 import LoginButton from "./login-button";
-import Head from "next/head";
 import { useI18n } from "@/i18n/I18nProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -11,10 +10,6 @@ export default function SetupUI() {
     const { t } = useI18n();
     return (
         <div className="flex items-center justify-center min-h-screen px-4 bg-gray-100 dark:bg-gray-900">
-            <Head>
-                <title>{t("setup.head.title")}</title>
-                <meta name="description" content={t("setup.head.description")} />
-            </Head>
             <div className="w-full max-w-md">
                 <div className="flex justify-end mb-4"><LanguageSwitcher /></div>
                 <div className="text-center mb-6">
