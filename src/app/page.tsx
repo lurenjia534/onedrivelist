@@ -3,9 +3,7 @@ import { getDriveType, listChildren } from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import zh from "@/i18n/dictionaries/zh";
-import en from "@/i18n/dictionaries/en";
+import { getDict } from "@/i18n/server";
 
 export const revalidate = 600;
 
@@ -14,9 +12,7 @@ export default async function Page() {
         redirect("/setup");
     }
     try {
-        const cookieStore = await cookies();
-        const locale = cookieStore.get("lang")?.value === "en" ? "en" : "zh";
-        const dict = locale === "zh" ? zh : en;
+        const { dict } = await getDict();
         const [driveType, { value: items }] = await Promise.all([
             getDriveType(),
             listChildren(),
@@ -36,9 +32,7 @@ export default async function Page() {
         );
     } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
-        const cookieStore = await cookies();
-        const locale = cookieStore.get("lang")?.value === "en" ? "en" : "zh";
-        const dict = locale === "zh" ? zh : en;
+        const { dict } = await getDict();
         const text = (dict["error.onedrive"] ?? "Error: {message}").replace("{message}", message);
         return <p className="text-red-600">{text}</p>;
     }

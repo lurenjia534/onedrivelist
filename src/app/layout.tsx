@@ -5,9 +5,8 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 import { getAuthToken } from "@/lib/authToken";
-import { I18nProvider, type Locale } from "@/i18n/I18nProvider";
-import zh from "@/i18n/dictionaries/zh";
-import en from "@/i18n/dictionaries/en";
+import { I18nProvider } from "@/i18n/I18nProvider";
+import { getDict } from "@/i18n/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +30,8 @@ export default async function RootLayout({
 }>) {
   const token = await getAuthToken();
   const cookieStore = await cookies();
-  const authed = !token ||
-    cookieStore.get("pwd-auth")?.value === token;
-  const cookieLang = cookieStore.get("lang")?.value;
-  const locale: Locale = cookieLang === "en" ? "en" : "zh";
-  const dict = locale === "zh" ? zh : en;
+  const authed = !token || cookieStore.get("pwd-auth")?.value === token;
+  const { locale, dict } = await getDict();
   return (
     <html lang={locale}>
       <body

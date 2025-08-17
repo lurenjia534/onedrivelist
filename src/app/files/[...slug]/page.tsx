@@ -2,9 +2,7 @@
 import {getDriveType, listChildren} from "@/lib/onedrive";
 import DriveList from "@/components/DriveList";
 import Breadcrumbs, {generateBreadcrumbs} from "@/components/Breadcrumbs";
-import { cookies } from "next/headers";
-import zh from "@/i18n/dictionaries/zh";
-import en from "@/i18n/dictionaries/en";
+import { getDict } from "@/i18n/server";
 
 export const revalidate = 600;
 
@@ -18,9 +16,7 @@ export default async function Page({
     const itemId = slug.at(-1);
 
     try {
-        const cookieStore = await cookies();
-        const locale = cookieStore.get("lang")?.value === "en" ? "en" : "zh";
-        const dict = locale === "zh" ? zh : en;
+        const { dict } = await getDict();
         const [, {value: items}, breadcrumbPath] = await Promise.all([
             getDriveType(),
             listChildren(itemId),
