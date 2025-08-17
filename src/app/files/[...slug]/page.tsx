@@ -24,7 +24,7 @@ export default async function Page({
         const [, {value: items}, breadcrumbPath] = await Promise.all([
             getDriveType(),
             listChildren(itemId),
-            generateBreadcrumbs(slug),
+            generateBreadcrumbs(slug, dict["breadcrumbs.unknown"]),
         ]);
 
         const currentFolder = breadcrumbPath[breadcrumbPath.length - 1];
