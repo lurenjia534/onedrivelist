@@ -1,95 +1,72 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Cloud } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React from "react";
 
 /**
- * 全局 Loading 组件
- * Next.js 会在页面或布局的 `loading.tsx` 中断显示时自动渲染它。
+ * 更轻量的全局 Loading 骨架屏：
+ * - 避免大面积动态背景，降低分心与能耗
+ * - 与文件列表布局一致，提升感知性能
+ * - 支持明暗主题与无障碍（aria-busy）
  */
 export default function Loading() {
+  const rows = Array.from({ length: 10 });
+
   return (
-    <div className="relative flex h-screen w-screen items-center justify-center bg-white dark:bg-black overflow-hidden">
-      {/* Grid pattern background - matching not-found.tsx */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] dark:opacity-20" />
-      
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white dark:from-black dark:via-gray-900/50 dark:to-black" />
+    <div
+      className="min-h-screen bg-white dark:bg-black"
+      role="status"
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="container mx-auto px-4 sm:px-8 py-6">
+        {/* 顶部条形骨架，模拟搜索栏与切换器区域 */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center">
+          <div className="h-8 w-40 rounded-lg bg-black/5 dark:bg-white/10 animate-pulse" />
+          <div className="flex-1 h-10 rounded-xl bg-black/5 dark:bg-white/10 animate-pulse" />
+          <div className="h-8 w-20 rounded-lg bg-black/5 dark:bg-white/10 animate-pulse" />
+        </div>
 
-      {/* Main loading container */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
-        className="relative z-10 flex flex-col items-center gap-6"
-      >
-        {/* Cloud icon with subtle animation */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="relative"
-        >
-          <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-2xl backdrop-blur-md">
-            <Cloud className="h-12 w-12 text-gray-800 dark:text-gray-200" />
+        {/* 内容容器 */}
+        <div className="bg-white/60 dark:bg-black/40 backdrop-blur p-5 rounded-2xl border border-black/5 dark:border-white/10">
+          {/* 面包屑骨架 */}
+          <div className="flex items-center gap-2 mb-6">
+            <div className="h-6 w-16 rounded-md bg-black/5 dark:bg-white/10 animate-pulse" />
+            <div className="h-6 w-24 rounded-md bg-black/5 dark:bg-white/10 animate-pulse" />
+            <div className="h-6 w-20 rounded-md bg-black/5 dark:bg-white/10 animate-pulse" />
           </div>
-        </motion.div>
 
-        {/* Loading text */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-center space-y-2"
-        >
-            <h2 className="text-2xl md:text-3xl font-semibold tracking-wide text-gray-900 dark:text-white">
-                Loading<span className="animate-pulse">...</span>
-            </h2>
-            <div className="flex items-center gap-1">
-            <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-              className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full"
-            />
-            <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-              className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full"
-            />
-            <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-              className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full"
-            />
-          </div>
-        </motion.div>
-      </motion.div>
+          {/* 列表骨架 */}
+          <ul className="space-y-2">
+            {rows.map((_, i) => (
+              <li
+                key={i}
+                className="flex items-center gap-4 px-4 sm:px-5 py-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.03]"
+              >
+                {/* 图标骨架 */}
+                <div className="h-9 w-9 rounded-lg bg-black/10 dark:bg-white/10 animate-pulse" />
+                {/* 标题骨架（可变宽） */}
+                <div className="flex-1">
+                  <div
+                    className="h-4 rounded-md bg-black/10 dark:bg-white/10 animate-pulse"
+                    style={{ width: `${60 + ((i * 13) % 35)}%` }}
+                  />
+                  <div className="mt-2 flex gap-4 text-xs">
+                    <div className="h-3 w-24 rounded bg-black/10 dark:bg-white/10 animate-pulse" />
+                    <div className="h-3 w-20 rounded bg-black/10 dark:bg-white/10 animate-pulse" />
+                  </div>
+                </div>
+                {/* 预览按钮骨架 */}
+                <div className="h-7 w-16 rounded-full bg-black/10 dark:bg-white/10 animate-pulse" />
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      {/* Decorative elements - matching not-found.tsx style */}
-      <motion.div
-        className="absolute top-20 left-20 w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-full blur-3xl opacity-50"
-        animate={{ 
-          x: [0, 50, 0],
-          y: [0, -50, 0],
-        }}
-        transition={{ 
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div
-        className="absolute bottom-20 right-20 w-40 h-40 bg-gray-100 dark:bg-gray-800 rounded-full blur-3xl opacity-50"
-        animate={{ 
-          x: [0, -50, 0],
-          y: [0, 50, 0],
-        }}
-        transition={{ 
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
+        {/* 页面底部徽标/信息骨架 */}
+        <div className="mt-6 flex justify-center">
+          <div className="h-5 w-52 rounded-md bg-black/5 dark:bg-white/10 animate-pulse" />
+        </div>
+      </div>
     </div>
   );
 }
