@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import LoginUI from "./login-ui";
+import LoginUI from "./LoginView";
 import { getAuthToken } from "@/lib/authToken";
 import { getDict } from "@/i18n/server";
 

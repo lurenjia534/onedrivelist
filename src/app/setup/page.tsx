@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import SetupUI from "./setup-ui";
+import SetupUI from "./SetupView";
 import type { Metadata } from "next";
 import { getDict } from "@/i18n/server";
 

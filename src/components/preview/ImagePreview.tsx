@@ -122,3 +122,4 @@ export default function ImagePreview({ src, alt, maxHeight = "60vh" }: ImagePrev
         </div>
     );
 }
+
