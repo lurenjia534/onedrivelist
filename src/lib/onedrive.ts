@@ -168,8 +168,8 @@ export async function getDownloadUrl(itemId: string) {
 }
 
 /**
- * Search drive items using Microsoft Graph search API.
- * @param query Search keyword.
+ * 使用Microsoft Graph搜索API搜索驱动器项目。
+ * @param query 搜索关键字。
  */
 export async function searchItems(query: string) {
     const accessToken = await getAccessToken();
