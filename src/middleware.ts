@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthToken } from "@/lib/authToken";
+import { getAuthTokens } from "@/lib/authToken";
 
 export async function middleware(req: NextRequest) {
-    const token = await getAuthToken();
-    // 未配置站点密码则放行所有请求
-    if (!token) {
+    const { user, admin } = await getAuthTokens();
+    // 未配置任意密码则放行所有请求
+    if (!user && !admin) {
         return NextResponse.next();
     }
 
@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
     // 保护 OneDrive API：需要有效的 pwd-auth cookie，否则返回 401
     if (pathname.startsWith("/api/onedrive")) {
         const cookie = req.cookies.get("pwd-auth");
-        if (cookie && cookie.value === token) {
+        if (cookie && (cookie.value === user || cookie.value === admin)) {
             return NextResponse.next();
         }
         return new NextResponse("Unauthorized", { status: 401 });
@@ -35,7 +35,7 @@ export async function middleware(req: NextRequest) {
     }
 
     const cookie = req.cookies.get("pwd-auth");
-    if (cookie && cookie.value === token) {
+    if (cookie && (cookie.value === user || cookie.value === admin)) {
         return NextResponse.next();
     }
 

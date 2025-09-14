@@ -4,7 +4,7 @@ import "./globals.css";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
-import { getAuthToken } from "@/lib/authToken";
+import { getAuthTokens } from "@/lib/authToken";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getDict } from "@/i18n/server";
 
@@ -28,9 +28,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const token = await getAuthToken();
+  const { user, admin } = await getAuthTokens();
   const cookieStore = await cookies();
-  const authed = !token || cookieStore.get("pwd-auth")?.value === token;
+  const tokenCookie = cookieStore.get("pwd-auth")?.value;
+  const authed = (!user && !admin) || tokenCookie === user || tokenCookie === admin;
   const { locale, dict } = await getDict();
   return (
     <html lang={locale}>
