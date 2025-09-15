@@ -4,7 +4,7 @@ import { Search, Cloud } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useI18n } from "@/i18n/I18nProvider";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
     const { t } = useI18n();

@@ -1,7 +1,6 @@
 // src/app/files/[...slug]/page.tsx
-import {getDriveType, listChildren} from "@/lib/onedrive";
-import DriveList from "@/components/DriveList";
-import Breadcrumbs, {generateBreadcrumbs} from "@/components/Breadcrumbs";
+import { getDriveType, listChildren } from "@/lib/onedrive";
+import { DriveList, Breadcrumbs, generateBreadcrumbs } from "@/features/drive";
 import { getDict } from "@/i18n/server";
 
 export const revalidate = 600;

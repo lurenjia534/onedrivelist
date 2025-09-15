@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Lock, LogIn, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { LanguageSwitcher } from "@/shared/ui";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export default function LoginUI({

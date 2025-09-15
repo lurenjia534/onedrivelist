@@ -4,7 +4,7 @@ import { CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import CopyButton from "./copy-button";
 import { motion } from "framer-motion";
 import { useI18n } from "@/i18n/I18nProvider";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { LanguageSwitcher } from "@/shared/ui";
 
 export default function TokenUI({ token }: { token: string | undefined }) {
     const { t } = useI18n();
@@ -134,4 +134,3 @@ export default function TokenUI({ token }: { token: string | undefined }) {
         </div>
     );
 }
-

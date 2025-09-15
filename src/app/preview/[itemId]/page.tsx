@@ -5,9 +5,7 @@ import {
     isTextExtension,
     isMarkdownExtension,
 } from "@/lib/fileTypes";
-import AudioPlayer from "@/components/preview/AudioPlayer";
-import TextPreview from "@/components/preview/TextPreview";
-import ImagePreview from "@/components/preview/ImagePreview";
+import { AudioPlayer, TextPreview, ImagePreview } from "@/features/preview";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 

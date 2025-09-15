@@ -1,7 +1,6 @@
 // src/app/page.tsx
 import { getDriveType, listChildren } from "@/lib/onedrive";
-import DriveList from "@/components/DriveList";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import { DriveList, Breadcrumbs } from "@/features/drive";
 import { redirect } from "next/navigation";
 import { getDict } from "@/i18n/server";
 

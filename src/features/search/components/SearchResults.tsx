@@ -1,12 +1,13 @@
 "use client";
 
-import DriveList, { Item } from "./DriveList";
+import { DriveList } from "@/features/drive";
+import type { DriveListItem } from "@/features/drive";
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/i18n/I18nProvider";
 
 interface SearchResultsProps {
-  items: Item[];
+  items: DriveListItem[];
   query: string;
 }
 

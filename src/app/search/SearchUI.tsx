@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Loader2 } from "lucide-react";
-import SearchResults from "@/components/SearchResults";
-import type { Item } from "@/components/DriveList";
+import { SearchResults } from "@/features/search";
+import type { DriveListItem } from "@/features/drive";
 import {
   getExtension,
   isAudioExtension,
@@ -17,7 +17,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 type SortKey = "relevance" | "date_desc" | "date_asc" | "name_asc" | "size_desc" | "size_asc";
 type FilterKey = "all" | "folders" | "files" | "images" | "audio" | "text" | "markdown" | "video" | "archives" | "code" | "docs" | "sheets";
 
-function filterItem(item: Item, filter: FilterKey): boolean {
+function filterItem(item: DriveListItem, filter: FilterKey): boolean {
   const isFolder = !!item.folder && !item.file;
   const ext = getExtension(item.name);
   switch (filter) {
@@ -48,7 +48,7 @@ function filterItem(item: Item, filter: FilterKey): boolean {
   }
 }
 
-function sortItems(items: Item[], sort: SortKey): Item[] {
+function sortItems(items: DriveListItem[], sort: SortKey): DriveListItem[] {
   const list = [...items];
   switch (sort) {
     case "date_desc":
@@ -73,7 +73,7 @@ export default function SearchUI() {
   const sp = useSearchParams();
 
   const [query, setQuery] = useState<string>(sp.get("q") ?? "");
-  const [items, setItems] = useState<Item[] | null>(null);
+  const [items, setItems] = useState<DriveListItem[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("date_desc");
@@ -98,7 +98,7 @@ export default function SearchUI() {
         if (!r.ok) throw new Error(await r.text());
         return r.json();
       })
-      .then((data: { value: Item[] }) => {
+      .then((data: { value: DriveListItem[] }) => {
         setItems(data.value ?? []);
       })
       .catch((e: unknown) => {

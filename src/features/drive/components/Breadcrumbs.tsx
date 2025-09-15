@@ -1,8 +1,8 @@
-// src/components/Breadcrumbs.tsx
+// src/features/drive/components/Breadcrumbs.tsx
 import Link from "next/link";
 import {ChevronRight, Home} from "lucide-react";
 import { getItem } from "@/lib/onedrive";
-import HomeLabel from "@/components/i18n/HomeLabel";
+import HomeLabel from "./HomeLabel";
 
 type PathSegment = {
     id: string;
