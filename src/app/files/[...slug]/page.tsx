@@ -2,6 +2,7 @@
 import { getDriveType, listChildren } from "@/lib/onedrive";
 import { DriveList, Breadcrumbs, generateBreadcrumbs } from "@/features/drive";
 import { getDict } from "@/i18n/server";
+import { cookies } from "next/headers";
 
 export const revalidate = 600;
 
@@ -21,6 +22,8 @@ export default async function Page({
             listChildren(itemId),
             generateBreadcrumbs(slug, dict["breadcrumbs.unknown"]),
         ]);
+        const cookieStore = await cookies();
+        const isAdmin = cookieStore.get("pwd-role")?.value === "admin";
 
         const currentFolder = breadcrumbPath[breadcrumbPath.length - 1];
 
@@ -28,7 +31,7 @@ export default async function Page({
             <div className="container mx-auto p-4">
                 <Breadcrumbs path={breadcrumbPath} />
                 <h1 className="text-2xl font-bold mb-4">{currentFolder?.name ?? dict["page.files.title"]}</h1>
-                <DriveList items={items} basePathSegments={slug} />
+                <DriveList items={items} basePathSegments={slug} isAdmin={isAdmin} />
             </div>
         );
     } catch (e) {

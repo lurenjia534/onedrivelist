@@ -3,6 +3,7 @@ import { getDriveType, listChildren } from "@/lib/onedrive";
 import { DriveList, Breadcrumbs } from "@/features/drive";
 import { redirect } from "next/navigation";
 import { getDict } from "@/i18n/server";
+import { cookies } from "next/headers";
 
 export const revalidate = 600;
 
@@ -16,10 +17,12 @@ export default async function Page() {
             getDriveType(),
             listChildren(),
         ]);
+        const cookieStore = await cookies();
+        const isAdmin = cookieStore.get("pwd-role")?.value === "admin";
         return (
             <div className="container mx-auto p-4">
                 <Breadcrumbs path={[]} />
-                <DriveList items={items} />
+                <DriveList items={items} isAdmin={isAdmin} />
                 <div className="mb-4 flex justify-center">
                     <span
                         className="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"

@@ -67,7 +67,7 @@ function sortItems(items: DriveListItem[], sort: SortKey): DriveListItem[] {
   }
 }
 
-export default function SearchUI() {
+export default function SearchUI({ isAdmin = false }: { isAdmin?: boolean }) {
   const { t } = useI18n();
   const router = useRouter();
   const sp = useSearchParams();
@@ -133,6 +133,10 @@ export default function SearchUI() {
     const list = (items ?? []).filter((it) => filterItem(it, filter));
     return sortItems(list, sort);
   }, [items, filter, sort]);
+
+  const handleDeleteSuccess = (id: string) => {
+    setItems((prev) => (prev ? prev.filter((item) => item.id !== id) : prev));
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-8 py-10">
@@ -205,7 +209,12 @@ export default function SearchUI() {
           ) : items && items.length === 0 ? (
             <p className="text-black/60 dark:text-white/60">{t("search.tip.none")}</p>
           ) : items ? (
-            <SearchResults items={displayed} query={query.trim()} />
+            <SearchResults
+              items={displayed}
+              query={query.trim()}
+              isAdmin={isAdmin}
+              onDelete={handleDeleteSuccess}
+            />
           ) : null}
         </div>
       </div>

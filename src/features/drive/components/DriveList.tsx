@@ -12,6 +12,7 @@ import {
     FileType2,
     FileArchive,
     FileCode,
+    Trash2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
@@ -24,8 +25,9 @@ import {
     isTextExtension,
     isMarkdownExtension,
 } from "@/lib/fileTypes";
+import { useEffect, useState } from "react";
 
-export type Item = {
+export type DriveListItem = {
     id: string;
     name: string;
     webUrl: string;
@@ -38,8 +40,10 @@ export type Item = {
 };
 
 interface DriveListProps {
-    items: Item[];
+    items: DriveListItem[];
     basePathSegments?: string[];
+    isAdmin?: boolean;
+    onDeleteSuccess?: (id: string) => void;
 }
 
 function formatSize(size: number): string {
@@ -82,7 +86,7 @@ function getFileIcon(name: string): LucideIcon {
     return getIconByExtension(getExtension(name));
 }
 
-function isImageFile(item: Item): boolean {
+function isImageFile(item: DriveListItem): boolean {
     const ext = getExtension(item.name);
     return (
         !!item.file &&
@@ -90,7 +94,7 @@ function isImageFile(item: Item): boolean {
     );
 }
 
-function isTextFile(item: Item): boolean {
+function isTextFile(item: DriveListItem): boolean {
     const ext = getExtension(item.name);
     return (
         !!item.file &&
@@ -98,7 +102,7 @@ function isTextFile(item: Item): boolean {
     );
 }
 
-function isAudioFile(item: Item): boolean {
+function isAudioFile(item: DriveListItem): boolean {
     const ext = getExtension(item.name);
     return (
         !!item.file &&
@@ -106,16 +110,48 @@ function isAudioFile(item: Item): boolean {
     );
 }
 
-function isMarkdownFile(item: Item): boolean {
+function isMarkdownFile(item: DriveListItem): boolean {
     const ext = getExtension(item.name);
     return !!item.file && ["md", "markdown"].includes(ext);
 }
 
-export default function DriveList({ items, basePathSegments = [] }: DriveListProps) {
+export default function DriveList({ items, basePathSegments = [], isAdmin = false, onDeleteSuccess }: DriveListProps) {
     const { t } = useI18n();
+    const [localItems, setLocalItems] = useState(items);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        setLocalItems(items);
+    }, [items]);
+
+    const handleDelete = async (item: DriveListItem) => {
+        const confirmed = window.confirm(
+            t("delete.confirm", { name: item.name })
+        );
+        if (!confirmed) return;
+
+        setDeletingId(item.id);
+        try {
+            const response = await fetch(`/api/onedrive/items/${item.id}`, {
+                method: "DELETE",
+            });
+            if (!response.ok) {
+                const message = await response.text().catch(() => response.statusText);
+                throw new Error(message);
+            }
+            setLocalItems((prev) => prev.filter((entry) => entry.id !== item.id));
+            onDeleteSuccess?.(item.id);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error ?? "unknown");
+            alert(t("delete.error", { message }));
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     return (
         <ul className="space-y-2">
-            {items.map((item, idx) => {
+            {localItems.map((item, idx) => {
                 // 构建新的动态路径
                 const newPathSegments = [...basePathSegments, item.id];
                 const href = `/files/${newPathSegments.join('/')}`;
@@ -161,6 +197,18 @@ export default function DriveList({ items, basePathSegments = [] }: DriveListPro
                             >
                                 {t("preview")}
                             </Link>
+                        )}
+
+                        {isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => handleDelete(item)}
+                                disabled={deletingId === item.id}
+                                className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Trash2 size={16} />
+                                {deletingId === item.id ? t("delete.deleting") : t("delete.action")}
+                            </button>
                         )}
 
                         <div className="flex flex-col sm:flex-row w-full sm:w-auto sm:ml-auto gap-0.5 sm:gap-4 text-sm text-black/50 dark:text-white/50">

@@ -3,6 +3,10 @@ const en = {
   "home": "Home",
   "search": "Search",
   "preview": "Preview",
+  "delete.action": "Delete",
+  "delete.deleting": "Deleting…",
+  "delete.confirm": "Are you sure you want to delete \"{name}\"? This will move the item to the recycle bin.",
+  "delete.error": "Failed to delete item: {message}",
 
   // Navbar
   "search.placeholder": "Search files...",

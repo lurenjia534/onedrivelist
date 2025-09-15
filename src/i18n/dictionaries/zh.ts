@@ -3,6 +3,10 @@ const zh = {
   "home": "主页",
   "search": "搜索",
   "preview": "预览",
+  "delete.action": "删除",
+  "delete.deleting": "正在删除…",
+  "delete.confirm": "确定要删除“{name}”吗？此操作会将该项移动到回收站。",
+  "delete.error": "删除失败：{message}",
 
   // Navbar
   "search.placeholder": "搜索文件...",

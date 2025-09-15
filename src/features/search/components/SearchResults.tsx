@@ -9,9 +9,11 @@ import { useI18n } from "@/i18n/I18nProvider";
 interface SearchResultsProps {
   items: DriveListItem[];
   query: string;
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
-export default function SearchResults({ items, query }: SearchResultsProps) {
+export default function SearchResults({ items, query, isAdmin = false, onDelete }: SearchResultsProps) {
   const { t } = useI18n();
   return (
       <motion.div
@@ -24,7 +26,7 @@ export default function SearchResults({ items, query }: SearchResultsProps) {
           <Search className="w-5 h-5" />
           <span>{t("search.results", { query })}</span>
         </h1>
-        <DriveList items={items} />
+        <DriveList items={items} isAdmin={isAdmin} onDeleteSuccess={onDelete} />
       </div>
     </motion.div>
   );
