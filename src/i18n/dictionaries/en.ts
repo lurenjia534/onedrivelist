@@ -7,6 +7,9 @@ const en = {
   "delete.deleting": "Deleting…",
   "delete.confirm": "Are you sure you want to delete \"{name}\"? This will move the item to the recycle bin.",
   "delete.error": "Failed to delete item: {message}",
+  "logout": "Log out",
+  "logout.loading": "Logging out…",
+  "logout.error": "Failed to log out: {message}",
 
   // Navbar
   "search.placeholder": "Search files...",

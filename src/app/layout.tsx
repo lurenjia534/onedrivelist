@@ -32,6 +32,8 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("pwd-auth")?.value;
   const authed = (!user && !admin) || tokenCookie === user || tokenCookie === admin;
+  const roleCookie = cookieStore.get("pwd-role")?.value;
+  const role = roleCookie === "admin" ? "admin" : roleCookie === "user" ? "user" : null;
   const { locale, dict } = await getDict();
   return (
     <html lang={locale}>
@@ -39,7 +41,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
       <I18nProvider locale={locale} dict={dict}>
-        {authed && <Navbar />}
+        {authed && <Navbar role={role} />}
         <main>{children}</main>
       </I18nProvider>
       </body>

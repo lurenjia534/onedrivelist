@@ -7,6 +7,9 @@ const zh = {
   "delete.deleting": "正在删除…",
   "delete.confirm": "确定要删除“{name}”吗？此操作会将该项移动到回收站。",
   "delete.error": "删除失败：{message}",
+  "logout": "退出登录",
+  "logout.loading": "正在退出…",
+  "logout.error": "退出失败：{message}",
 
   // Navbar
   "search.placeholder": "搜索文件...",

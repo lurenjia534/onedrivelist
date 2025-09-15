@@ -1,13 +1,40 @@
 "use client";
 
-import { Search, Cloud } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Search, Cloud, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useI18n } from "@/i18n/I18nProvider";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-export default function Navbar() {
+type Role = "admin" | "user" | null;
+
+export default function Navbar({ role = null }: { role?: Role }) {
     const { t } = useI18n();
+    const router = useRouter();
+    const [loggingOut, setLoggingOut] = useState(false);
+    const canLogout = Boolean(role);
+
+    const handleLogout = async () => {
+        if (loggingOut) return;
+        setLoggingOut(true);
+        try {
+            const res = await fetch("/api/logout", { method: "POST" });
+            if (!res.ok) {
+                const message = await res.text().catch(() => res.statusText);
+                throw new Error(message || res.statusText);
+            }
+            router.push("/login");
+            router.refresh();
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error ?? "unknown");
+            alert(t("logout.error", { message }));
+        } finally {
+            setLoggingOut(false);
+        }
+    };
+
     return (
         <header className="sticky top-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md">
             <div className="container mx-auto px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-0 sm:justify-between">
@@ -45,6 +72,21 @@ export default function Navbar() {
                         </motion.button>
                     </motion.form>
                     <LanguageSwitcher />
+                    {canLogout && (
+                        <button
+                            type="button"
+                            onClick={handleLogout}
+                            disabled={loggingOut}
+                            className="p-2 rounded-lg border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors disabled:opacity-60"
+                            aria-label={t("logout")}
+                        >
+                            {loggingOut ? (
+                                <span className="block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <LogOut className="w-4 h-4" />
+                            )}
+                        </button>
+                    )}
                 </div>
             </div>
         </header>
