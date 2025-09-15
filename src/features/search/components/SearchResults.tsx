@@ -1,7 +1,7 @@
 "use client";
 
-import { DriveList } from "@/features/drive";
-import type { DriveListItem } from "@/features/drive";
+import { DriveList } from "@/features/drive/client";
+import type { DriveListItem } from "@/features/drive/client";
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/i18n/I18nProvider";

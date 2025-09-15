@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Loader2 } from "lucide-react";
 import { SearchResults } from "@/features/search";
-import type { DriveListItem } from "@/features/drive";
+import type { DriveListItem } from "@/features/drive/client";
 import {
   getExtension,
   isAudioExtension,
