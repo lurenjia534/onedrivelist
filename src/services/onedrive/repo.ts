@@ -139,3 +139,24 @@ export function isOriginAllowed(origin: string | null, selfOrigin: string): bool
     return false;
   }
 }
+
+export async function deleteDriveItem(itemId: string, options: { ifMatch?: string } = {}): Promise<void> {
+  const headers = new Headers();
+  if (options.ifMatch) {
+    headers.set("If-Match", options.ifMatch);
+  }
+
+  const res = await graphFetch(`/me/drive/items/${itemId}`, {
+    method: "DELETE",
+    headers,
+    next: { revalidate: 0 },
+  });
+
+  if (!res.ok && res.status !== 204) {
+    throw new ExternalServiceError(`Failed to delete drive item ${itemId}`, {
+      status: res.status,
+    });
+  }
+
+  searchCache.clear();
+}
