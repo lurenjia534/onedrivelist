@@ -14,6 +14,7 @@ import {
     FileArchive,
     FileCode,
     Trash2,
+    Pencil,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
@@ -29,6 +30,7 @@ import {
 import { useEffect, useState } from "react";
 import CreateFolderDialog from "./CreateFolderDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import RenameDialog from "./RenameDialog";
 
 export type DriveListItem = {
     id: string;
@@ -127,6 +129,9 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [dialogError, setDialogError] = useState<string | null>(null);
     const [deleteDialogItem, setDeleteDialogItem] = useState<DriveListItem | null>(null);
     const [deleteDialogError, setDeleteDialogError] = useState<string | null>(null);
+    const [renameDialogItem, setRenameDialogItem] = useState<DriveListItem | null>(null);
+    const [renameDialogError, setRenameDialogError] = useState<string | null>(null);
+    const [renaming, setRenaming] = useState(false);
 
     useEffect(() => {
         setLocalItems(items);
@@ -186,6 +191,36 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const handleConfirmDelete = async () => {
         if (!deleteDialogItem) return;
         await performDelete(deleteDialogItem);
+    };
+
+    const handleRename = async (name: string): Promise<boolean> => {
+        if (!renameDialogItem) return false;
+        setRenaming(true);
+        setRenameDialogError(null);
+        try {
+            const response = await fetch(`/api/onedrive/items/${renameDialogItem.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name }),
+            });
+            if (!response.ok) {
+                const message = await response.text().catch(() => response.statusText);
+                throw new Error(message);
+            }
+
+            const updated = (await response.json()) as DriveListItem;
+            setLocalItems((prev) =>
+                prev.map((entry) => (entry.id === updated.id ? { ...entry, ...updated } : entry))
+            );
+            setRenameDialogItem(null);
+            return true;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error ?? "unknown");
+            setRenameDialogError(t("rename.error", { message }));
+            return false;
+        } finally {
+            setRenaming(false);
+        }
     };
 
     return (
@@ -269,6 +304,23 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                                 {deletingId === item.id ? t("delete.deleting") : t("delete.action")}
                             </button>
                         )}
+                        {isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setRenameDialogItem(item);
+                                    setRenameDialogError(null);
+                                }}
+                                disabled={
+                                    (renaming && renameDialogItem?.id === item.id) ||
+                                    deletingId === item.id
+                                }
+                                className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Pencil size={16} />
+                                {renaming && renameDialogItem?.id === item.id ? t("rename.saving") : t("rename.action")}
+                            </button>
+                        )}
 
                         <div className="flex flex-col sm:flex-row w-full sm:w-auto sm:ml-auto gap-0.5 sm:gap-4 text-sm text-black/50 dark:text-white/50">
                             <span className="group-hover:text-black dark:group-hover:text-white transition-colors">
@@ -305,6 +357,20 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                         if (deletingId === deleteDialogItem.id) return;
                         setDeleteDialogItem(null);
                         setDeleteDialogError(null);
+                    }}
+                />
+            )}
+            {isAdmin && renameDialogItem && (
+                <RenameDialog
+                    open={!!renameDialogItem}
+                    initialName={renameDialogItem.name}
+                    submitting={renaming}
+                    error={renameDialogError}
+                    onConfirm={handleRename}
+                    onClose={() => {
+                        if (renaming) return;
+                        setRenameDialogItem(null);
+                        setRenameDialogError(null);
                     }}
                 />
             )}
