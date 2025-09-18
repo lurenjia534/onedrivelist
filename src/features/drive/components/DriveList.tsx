@@ -27,6 +27,7 @@ import {
     isMarkdownExtension,
 } from "@/lib/fileTypes";
 import { useEffect, useState } from "react";
+import CreateFolderDialog from "./CreateFolderDialog";
 
 export type DriveListItem = {
     id: string;
@@ -121,18 +122,17 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [localItems, setLocalItems] = useState(items);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [creating, setCreating] = useState(false);
+    const [isDialogOpen, setDialogOpen] = useState(false);
+    const [dialogError, setDialogError] = useState<string | null>(null);
 
     useEffect(() => {
         setLocalItems(items);
     }, [items]);
 
-    const handleCreateFolder = async () => {
-        const nameInput = window.prompt(t("folder.prompt"));
-        const name = nameInput?.trim();
-        if (!name) return;
-
+    const handleCreateFolder = async (name: string): Promise<boolean> => {
         const parentId = basePathSegments.at(-1);
         setCreating(true);
+        setDialogError(null);
         try {
             const response = await fetch("/api/onedrive/folders", {
                 method: "POST",
@@ -147,9 +147,12 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
 
             const created = (await response.json()) as DriveListItem;
             setLocalItems((prev) => [created, ...prev]);
+            setDialogOpen(false);
+            return true;
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error ?? "unknown");
-            alert(t("folder.error", { message }));
+            setDialogError(t("folder.error", { message }));
+            return false;
         } finally {
             setCreating(false);
         }
@@ -186,12 +189,15 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                 <div className="flex justify-end mb-4">
                     <button
                         type="button"
-                        onClick={handleCreateFolder}
+                        onClick={() => {
+                            setDialogError(null);
+                            setDialogOpen(true);
+                        }}
                         disabled={creating}
                         className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                         <FolderPlus size={16} />
-                        <span>{creating ? t("folder.creating") : t("folder.create")}</span>
+                        <span>{t("folder.create")}</span>
                     </button>
                 </div>
             )}
@@ -268,6 +274,18 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                 );
             })}
             </ul>
+            {isAdmin && (
+                <CreateFolderDialog
+                    open={isDialogOpen}
+                    submitting={creating}
+                    error={dialogError}
+                    onConfirm={handleCreateFolder}
+                    onClose={() => {
+                        setDialogOpen(false);
+                        setDialogError(null);
+                    }}
+                />
+            )}
         </>
     );
 }
