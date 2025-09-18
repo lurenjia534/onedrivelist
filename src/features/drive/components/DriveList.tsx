@@ -13,8 +13,6 @@ import {
     FileType2,
     FileArchive,
     FileCode,
-    Trash2,
-    Pencil,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
@@ -31,6 +29,7 @@ import { useEffect, useState } from "react";
 import CreateFolderDialog from "./CreateFolderDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import RenameDialog from "./RenameDialog";
+import DriveItemActions from "./DriveItemActions";
 
 export type DriveListItem = {
     id: string;
@@ -132,6 +131,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [renameDialogItem, setRenameDialogItem] = useState<DriveListItem | null>(null);
     const [renameDialogError, setRenameDialogError] = useState<string | null>(null);
     const [renaming, setRenaming] = useState(false);
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
     useEffect(() => {
         setLocalItems(items);
@@ -180,6 +180,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
             setLocalItems((prev) => prev.filter((entry) => entry.id !== item.id));
             onDeleteSuccess?.(item.id);
             setDeleteDialogItem(null);
+            setOpenMenuId(null);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error ?? "unknown");
             setDeleteDialogError(t("delete.error", { message }));
@@ -213,6 +214,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                 prev.map((entry) => (entry.id === updated.id ? { ...entry, ...updated } : entry))
             );
             setRenameDialogItem(null);
+            setOpenMenuId(null);
             return true;
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error ?? "unknown");
@@ -291,35 +293,23 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                         )}
 
                         {isAdmin && (
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setDeleteDialogItem(item);
-                                    setDeleteDialogError(null);
-                                }}
-                                disabled={deletingId === item.id}
-                                className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <Trash2 size={16} />
-                                {deletingId === item.id ? t("delete.deleting") : t("delete.action")}
-                            </button>
-                        )}
-                        {isAdmin && (
-                            <button
-                                type="button"
-                                onClick={() => {
+                            <DriveItemActions
+                                isOpen={openMenuId === item.id}
+                                disabled={
+                                    deletingId === item.id ||
+                                    (renaming && renameDialogItem?.id === item.id)
+                                }
+                                onOpen={() => setOpenMenuId(item.id)}
+                                onClose={() => setOpenMenuId(null)}
+                                onRename={() => {
                                     setRenameDialogItem(item);
                                     setRenameDialogError(null);
                                 }}
-                                disabled={
-                                    (renaming && renameDialogItem?.id === item.id) ||
-                                    deletingId === item.id
-                                }
-                                className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <Pencil size={16} />
-                                {renaming && renameDialogItem?.id === item.id ? t("rename.saving") : t("rename.action")}
-                            </button>
+                                onDelete={() => {
+                                    setDeleteDialogItem(item);
+                                    setDeleteDialogError(null);
+                                }}
+                            />
                         )}
 
                         <div className="flex flex-col sm:flex-row w-full sm:w-auto sm:ml-auto gap-0.5 sm:gap-4 text-sm text-black/50 dark:text-white/50">
