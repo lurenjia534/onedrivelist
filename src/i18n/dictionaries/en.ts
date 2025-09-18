@@ -20,6 +20,7 @@ const en = {
   "folder.cancel": "Cancel",
   "folder.submit": "Create",
   "folder.validation.required": "Please provide a folder name.",
+  "actions.more": "More actions",
   "rename.action": "Rename",
   "rename.saving": "Renaming…",
   "rename.error": "Failed to rename: {message}",

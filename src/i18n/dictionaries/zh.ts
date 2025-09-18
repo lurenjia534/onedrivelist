@@ -20,6 +20,7 @@ const zh = {
   "folder.cancel": "取消",
   "folder.submit": "创建",
   "folder.validation.required": "请填写文件夹名称。",
+  "actions.more": "更多操作",
   "rename.action": "重命名",
   "rename.saving": "正在重命名…",
   "rename.error": "重命名失败：{message}",
