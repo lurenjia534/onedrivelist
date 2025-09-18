@@ -28,6 +28,7 @@ import {
 } from "@/lib/fileTypes";
 import { useEffect, useState } from "react";
 import CreateFolderDialog from "./CreateFolderDialog";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 
 export type DriveListItem = {
     id: string;
@@ -124,6 +125,8 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [creating, setCreating] = useState(false);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dialogError, setDialogError] = useState<string | null>(null);
+    const [deleteDialogItem, setDeleteDialogItem] = useState<DriveListItem | null>(null);
+    const [deleteDialogError, setDeleteDialogError] = useState<string | null>(null);
 
     useEffect(() => {
         setLocalItems(items);
@@ -158,13 +161,9 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
         }
     };
 
-    const handleDelete = async (item: DriveListItem) => {
-        const confirmed = window.confirm(
-            t("delete.confirm", { name: item.name })
-        );
-        if (!confirmed) return;
-
+    const performDelete = async (item: DriveListItem) => {
         setDeletingId(item.id);
+        setDeleteDialogError(null);
         try {
             const response = await fetch(`/api/onedrive/items/${item.id}`, {
                 method: "DELETE",
@@ -175,12 +174,18 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
             }
             setLocalItems((prev) => prev.filter((entry) => entry.id !== item.id));
             onDeleteSuccess?.(item.id);
+            setDeleteDialogItem(null);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error ?? "unknown");
-            alert(t("delete.error", { message }));
+            setDeleteDialogError(t("delete.error", { message }));
         } finally {
             setDeletingId(null);
         }
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteDialogItem) return;
+        await performDelete(deleteDialogItem);
     };
 
     return (
@@ -253,7 +258,10 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                         {isAdmin && (
                             <button
                                 type="button"
-                                onClick={() => handleDelete(item)}
+                                onClick={() => {
+                                    setDeleteDialogItem(item);
+                                    setDeleteDialogError(null);
+                                }}
                                 disabled={deletingId === item.id}
                                 className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -283,6 +291,20 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                     onClose={() => {
                         setDialogOpen(false);
                         setDialogError(null);
+                    }}
+                />
+            )}
+            {isAdmin && deleteDialogItem && (
+                <ConfirmDeleteDialog
+                    open={!!deleteDialogItem}
+                    itemName={deleteDialogItem.name}
+                    loading={deletingId === deleteDialogItem.id}
+                    error={deleteDialogError}
+                    onConfirm={handleConfirmDelete}
+                    onClose={() => {
+                        if (deletingId === deleteDialogItem.id) return;
+                        setDeleteDialogItem(null);
+                        setDeleteDialogError(null);
                     }}
                 />
             )}
