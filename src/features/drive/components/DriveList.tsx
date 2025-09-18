@@ -250,6 +250,13 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                 const href = `/files/${newPathSegments.join('/')}`;
 
                 const Icon = item.folder ? Folder : getFileIcon(item.name);
+                const actionsOpen = openMenuId === item.id;
+                const itemClasses = [
+                    "relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-3 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group",
+                    actionsOpen ? "z-40" : "",
+                ]
+                    .filter(Boolean)
+                    .join(" ");
 
                 return (
                     <motion.li
@@ -258,7 +265,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.04 }}
                         whileHover={{ scale: 1.01, x: 4 }}
-                        className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-3 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group"
+                        className={itemClasses}
                     >
                         {/* 图标 */}
                         <span className="text-black dark:text-white opacity-70 group-hover:opacity-100 transition-opacity shrink-0 bg-gray-100 dark:bg-gray-900 p-2 rounded-lg">
@@ -294,7 +301,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
 
                         {isAdmin && (
                             <DriveItemActions
-                                isOpen={openMenuId === item.id}
+                                isOpen={actionsOpen}
                                 disabled={
                                     deletingId === item.id ||
                                     (renaming && renameDialogItem?.id === item.id)

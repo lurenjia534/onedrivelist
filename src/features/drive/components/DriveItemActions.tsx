@@ -48,7 +48,7 @@ export default function DriveItemActions({
   }, [isOpen, onClose]);
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative z-30" ref={menuRef}>
       <button
         type="button"
         onClick={() => (isOpen ? onClose() : onOpen())}
@@ -61,7 +61,7 @@ export default function DriveItemActions({
         <MoreVertical size={16} />
       </button>
       {isOpen && (
-        <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
           <button
             type="button"
             onClick={() => {
