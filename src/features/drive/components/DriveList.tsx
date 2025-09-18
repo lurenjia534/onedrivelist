@@ -2,6 +2,7 @@
 
 import {
     Folder,
+    FolderPlus,
     FileText,
     FileImage,
     FileVideo,
@@ -119,10 +120,40 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const { t } = useI18n();
     const [localItems, setLocalItems] = useState(items);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [creating, setCreating] = useState(false);
 
     useEffect(() => {
         setLocalItems(items);
     }, [items]);
+
+    const handleCreateFolder = async () => {
+        const nameInput = window.prompt(t("folder.prompt"));
+        const name = nameInput?.trim();
+        if (!name) return;
+
+        const parentId = basePathSegments.at(-1);
+        setCreating(true);
+        try {
+            const response = await fetch("/api/onedrive/folders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, parentId }),
+            });
+
+            if (!response.ok) {
+                const message = await response.text().catch(() => response.statusText);
+                throw new Error(message);
+            }
+
+            const created = (await response.json()) as DriveListItem;
+            setLocalItems((prev) => [created, ...prev]);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error ?? "unknown");
+            alert(t("folder.error", { message }));
+        } finally {
+            setCreating(false);
+        }
+    };
 
     const handleDelete = async (item: DriveListItem) => {
         const confirmed = window.confirm(
@@ -150,7 +181,21 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     };
 
     return (
-        <ul className="space-y-2">
+        <>
+            {isAdmin && (
+                <div className="flex justify-end mb-4">
+                    <button
+                        type="button"
+                        onClick={handleCreateFolder}
+                        disabled={creating}
+                        className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                        <FolderPlus size={16} />
+                        <span>{creating ? t("folder.creating") : t("folder.create")}</span>
+                    </button>
+                </div>
+            )}
+            <ul className="space-y-2">
             {localItems.map((item, idx) => {
                 // 构建新的动态路径
                 const newPathSegments = [...basePathSegments, item.id];
@@ -222,6 +267,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                     </motion.li>
                 );
             })}
-        </ul>
+            </ul>
+        </>
     );
 }

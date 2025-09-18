@@ -25,6 +25,22 @@ export type DriveItemListResponse = {
   value: DriveItemSummary[];
 };
 
+type DriveItemPayload = {
+  id: string;
+  name: string;
+  webUrl: string;
+  folder?: Record<string, unknown>;
+  file?: { mimeType?: string };
+  size?: number;
+  lastModifiedDateTime: string;
+};
+
+export type CreateFolderInput = {
+  name: string;
+  parentId?: string;
+  conflictBehavior?: "fail" | "replace" | "rename";
+};
+
 export type SearchResponse = DriveItemListResponse & {
   "@odata.nextLink"?: string;
 };
@@ -41,6 +57,42 @@ export async function listChildren(itemId?: string): Promise<DriveItemListRespon
     next: { revalidate: 600 },
   });
   return (await res.json()) as DriveItemListResponse;
+}
+
+function toDriveItemSummary(item: DriveItemPayload): DriveItemSummary {
+  return {
+    id: item.id,
+    name: item.name,
+    webUrl: item.webUrl,
+    folder: item.folder,
+    file: item.file,
+    size: item.size ?? 0,
+    lastModifiedDateTime: item.lastModifiedDateTime,
+  };
+}
+
+export async function createFolder({
+  name,
+  parentId,
+  conflictBehavior = "rename",
+}: CreateFolderInput): Promise<DriveItemSummary> {
+  const endpoint = parentId
+    ? `/me/drive/items/${parentId}/children`
+    : "/me/drive/root/children";
+  const res = await graphFetch(`${endpoint}?${ITEM_SELECT}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      folder: {},
+      "@microsoft.graph.conflictBehavior": conflictBehavior,
+    }),
+    next: { revalidate: 0 },
+  });
+
+  const payload = (await res.json()) as DriveItemPayload;
+  searchCache.clear();
+  return toDriveItemSummary(payload);
 }
 
 export async function getDriveType(): Promise<"personal" | "business"> {

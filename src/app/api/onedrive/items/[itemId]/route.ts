@@ -1,17 +1,8 @@
 import type { NextRequest } from "next/server";
 
 import { deleteDriveItem } from "@/services/onedrive/repo";
-import { toErrorResponse, ForbiddenError } from "@/lib/errors";
-import { getAuthTokens } from "@/lib/authToken";
-
-async function assertAdmin(req: NextRequest) {
-  const authCookie = req.cookies.get("pwd-auth")?.value;
-  const { admin } = await getAuthTokens();
-
-  if (!admin || !authCookie || authCookie !== admin) {
-    throw new ForbiddenError("Admin privileges required");
-  }
-}
+import { toErrorResponse } from "@/lib/errors";
+import { assertAdmin } from "@/app/api/onedrive/utils";
 
 export async function DELETE(
   req: NextRequest,
