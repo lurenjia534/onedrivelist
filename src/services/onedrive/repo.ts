@@ -95,6 +95,28 @@ export async function createFolder({
   return toDriveItemSummary(payload);
 }
 
+export async function renameDriveItem(
+  itemId: string,
+  name: string,
+  options: { ifMatch?: string } = {}
+): Promise<DriveItemSummary> {
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (options.ifMatch) {
+    headers.set("If-Match", options.ifMatch);
+  }
+
+  const res = await graphFetch(`/me/drive/items/${itemId}?${ITEM_SELECT}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ name }),
+    next: { revalidate: 0 },
+  });
+
+  const payload = (await res.json()) as DriveItemPayload;
+  searchCache.clear();
+  return toDriveItemSummary(payload);
+}
+
 export async function getDriveType(): Promise<"personal" | "business"> {
   const res = await graphFetch(`/me/drive?${DRIVE_TYPE_SELECT}`, {
     next: { revalidate: 600 },
