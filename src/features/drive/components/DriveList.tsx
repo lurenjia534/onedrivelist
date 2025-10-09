@@ -55,15 +55,19 @@ function formatSize(size: number): string {
     const MB = KB * 1024;
     const GB = MB * 1024;
 
+    if (size < KB) {
+        return `${size} B`;
+    }
+
     if (size >= GB) {
-        return `${(size / GB).toFixed(1)} GB`;
+        return `${(size / GB).toFixed(1).replace(/\.0$/, "")} GB`;
     }
 
     if (size >= MB) {
-        return `${(size / MB).toFixed(1)} MB`;
+        return `${(size / MB).toFixed(1).replace(/\.0$/, "")} MB`;
     }
 
-    return `${(size / KB).toFixed(1)} KB`;
+    return `${(size / KB).toFixed(1).replace(/\.0$/, "")} KB`;
 }
 
 function formatDate(iso: string): string {
