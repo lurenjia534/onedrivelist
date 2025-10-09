@@ -30,6 +30,7 @@ import CreateFolderDialog from "./CreateFolderDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import RenameDialog from "./RenameDialog";
 import DriveItemActions from "./DriveItemActions";
+import ConfirmBulkDeleteDialog from "./ConfirmBulkDeleteDialog";
 
 export type DriveListItem = {
     id: string;
@@ -136,10 +137,60 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [renameDialogError, setRenameDialogError] = useState<string | null>(null);
     const [renaming, setRenaming] = useState(false);
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+    const [selectionMode, setSelectionMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+    const [bulkDeleting, setBulkDeleting] = useState(false);
+    const [bulkDeleteError, setBulkDeleteError] = useState<string | null>(null);
+
+    const isSelecting = selectionMode || selectedIds.length > 0;
+    const selectedItems = localItems.filter((item) => selectedIds.includes(item.id));
+    const selectedCount = selectedItems.length;
+    const allSelected = selectedCount > 0 && selectedCount === localItems.length && localItems.length > 0;
 
     useEffect(() => {
         setLocalItems(items);
     }, [items]);
+
+    useEffect(() => {
+        setSelectedIds((prev) => prev.filter((id) => items.some((entry) => entry.id === id)));
+    }, [items]);
+
+    useEffect(() => {
+        if (isSelecting && openMenuId) {
+            setOpenMenuId(null);
+        }
+    }, [isSelecting, openMenuId]);
+
+    const handleSelectionModeToggle = () => {
+        if (isSelecting) {
+            setSelectionMode(false);
+            setSelectedIds([]);
+            setBulkDeleteError(null);
+        } else {
+            setSelectionMode(true);
+        }
+    };
+
+    const toggleSelection = (id: string) => {
+        setSelectionMode(true);
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (allSelected) {
+            setSelectedIds([]);
+        } else {
+            setSelectionMode(true);
+            setSelectedIds(localItems.map((entry) => entry.id));
+        }
+    };
+
+    const handleClearSelection = () => {
+        setSelectedIds([]);
+    };
 
     const handleCreateFolder = async (name: string): Promise<boolean> => {
         const parentId = basePathSegments.at(-1);
@@ -185,6 +236,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
             onDeleteSuccess?.(item.id);
             setDeleteDialogItem(null);
             setOpenMenuId(null);
+            setSelectedIds((prev) => prev.filter((value) => value !== item.id));
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error ?? "unknown");
             setDeleteDialogError(t("delete.error", { message }));
@@ -196,6 +248,53 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const handleConfirmDelete = async () => {
         if (!deleteDialogItem) return;
         await performDelete(deleteDialogItem);
+    };
+
+    const handleBulkDelete = async () => {
+        if (!selectedCount) return;
+        const idsToDelete = [...selectedIds];
+        setBulkDeleting(true);
+        setBulkDeleteError(null);
+
+        const failures: Array<{ name: string; message: string }> = [];
+
+        for (const id of idsToDelete) {
+            const item = localItems.find((entry) => entry.id === id);
+            if (!item) {
+                setSelectedIds((prev) => prev.filter((value) => value !== id));
+                continue;
+            }
+
+            try {
+                const response = await fetch(`/api/onedrive/items/${id}`, {
+                    method: "DELETE",
+                });
+                if (!response.ok) {
+                    const message = await response.text().catch(() => response.statusText);
+                    throw new Error(message);
+                }
+
+                setLocalItems((prev) => prev.filter((entry) => entry.id !== id));
+                setSelectedIds((prev) => prev.filter((value) => value !== id));
+                onDeleteSuccess?.(id);
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error ?? "unknown");
+                failures.push({ name: item.name, message });
+            }
+        }
+
+        if (failures.length > 0) {
+            const names = failures
+                .map((entry) => `${entry.name} (${entry.message})`)
+                .join("、");
+            setBulkDeleteError(t("bulk.delete.error", { names }));
+        } else {
+            setBulkDialogOpen(false);
+            setSelectionMode(false);
+            setSelectedIds([]);
+        }
+
+        setBulkDeleting(false);
     };
 
     const handleRename = async (name: string): Promise<boolean> => {
@@ -232,108 +331,171 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     return (
         <>
             {isAdmin && (
-                <div className="flex justify-end mb-4">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setDialogError(null);
-                            setDialogOpen(true);
-                        }}
-                        disabled={creating}
-                        className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                        <FolderPlus size={16} />
-                        <span>{t("folder.create")}</span>
-                    </button>
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={handleSelectionModeToggle}
+                            disabled={bulkDeleting}
+                            className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                        >
+                            {isSelecting ? t("bulk.select.exit") : t("bulk.select.enter")}
+                        </button>
+                        {isSelecting && localItems.length > 0 && (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={handleSelectAll}
+                                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                                    disabled={!localItems.length}
+                                >
+                                    {allSelected ? t("bulk.select.none") : t("bulk.select.all")}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleClearSelection}
+                                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                                    disabled={!selectedCount}
+                                >
+                                    {t("bulk.select.clear")}
+                                </button>
+                                {selectedCount > 0 && (
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {t("bulk.selected.count", { count: selectedCount })}
+                                    </span>
+                                )}
+                            </>
+                        )}
+                    </div>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                        {isSelecting && selectedCount > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setBulkDeleteError(null);
+                                    setBulkDialogOpen(true);
+                                }}
+                                disabled={bulkDeleting}
+                                className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                                {bulkDeleting ? t("bulk.delete.deleting") : t("bulk.delete.action")}
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setDialogError(null);
+                                setDialogOpen(true);
+                            }}
+                            disabled={creating}
+                            className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                        >
+                            <FolderPlus size={16} />
+                            <span>{t("folder.create")}</span>
+                        </button>
+                    </div>
                 </div>
             )}
             <ul className="space-y-2">
-            {localItems.map((item, idx) => {
-                // 构建新的动态路径
-                const newPathSegments = [...basePathSegments, item.id];
-                const href = `/files/${newPathSegments.join('/')}`;
+                {localItems.map((item, idx) => {
+                    const newPathSegments = [...basePathSegments, item.id];
+                    const href = `/files/${newPathSegments.join("/")}`;
 
-                const Icon = item.folder ? Folder : getFileIcon(item.name);
-                const actionsOpen = openMenuId === item.id;
-                const itemClasses = [
-                    "relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-3 mb-1 rounded-xl hover:bg-white dark:hover:bg-black transition-all duration-200 group",
-                    actionsOpen ? "z-40" : "",
-                ]
-                    .filter(Boolean)
-                    .join(" ");
+                    const Icon = item.folder ? Folder : getFileIcon(item.name);
+                    const actionsOpen = openMenuId === item.id;
+                    const isSelected = selectedIds.includes(item.id);
+                    const itemClasses = [
+                        "relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-3 mb-1 rounded-xl transition-all duration-200 group",
+                        "hover:bg-white dark:hover:bg-black",
+                        isSelected ? "ring-2 ring-black/30 dark:ring-white/40" : "",
+                        isSelecting ? "bg-gray-50/60 dark:bg-white/5" : "",
+                        actionsOpen ? "z-40" : "",
+                    ]
+                        .filter(Boolean)
+                        .join(" ");
+                    const nameClass = [
+                        "flex-1 truncate text-black dark:text-white font-medium transition-transform",
+                        !isSelecting ? "group-hover:translate-x-1 cursor-pointer" : "opacity-70",
+                    ]
+                        .filter(Boolean)
+                        .join(" ");
 
-                return (
-                    <motion.li
-                        key={item.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.04 }}
-                        whileHover={{ scale: 1.01, x: 4 }}
-                        className={itemClasses}
-                    >
-                        {/* 图标 */}
-                        <span className="text-black dark:text-white opacity-70 group-hover:opacity-100 transition-opacity shrink-0 bg-gray-100 dark:bg-gray-900 p-2 rounded-lg">
-                            <Icon size={20} />
-                        </span>
+                    return (
+                        <motion.li
+                            key={item.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.04 }}
+                            whileHover={isSelecting ? undefined : { scale: 1.01, x: 4 }}
+                            className={itemClasses}
+                        >
+                            <div className="flex items-center gap-3">
+                                {isSelecting && (
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => toggleSelection(item.id)}
+                                        className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:ring-white"
+                                        aria-label={t("bulk.select.item", { name: item.name })}
+                                    />
+                                )}
+                                <span className="text-black dark:text-white opacity-70 group-hover:opacity-100 transition-opacity shrink-0 rounded-lg bg-gray-100 p-2 dark:bg-gray-900">
+                                    <Icon size={20} />
+                                </span>
+                            </div>
 
-                        {/* 名称（可点击） */}
-                        {item.folder ? (
-                            <Link href={href} className="flex-1 truncate text-black dark:text-white font-medium group-hover:translate-x-1 transition-transform cursor-pointer">
-                                {item.name}
-                            </Link>
-                        ) : (
-                            <a
-                                href={`/api/onedrive/download/${item.id}`}
-                                className="flex-1 truncate text-black dark:text-white font-medium group-hover:translate-x-1 transition-transform cursor-pointer"
-                            >
-                                {item.name}
-                            </a>
-                        )}
+                            {isSelecting ? (
+                                <span className={nameClass}>{item.name}</span>
+                            ) : item.folder ? (
+                                <Link href={href} className={nameClass}>
+                                    {item.name}
+                                </Link>
+                            ) : (
+                                <a href={`/api/onedrive/download/${item.id}`} className={nameClass}>
+                                    {item.name}
+                                </a>
+                            )}
 
-                        {/* 预览按钮，图片、文本、音频及 Markdown 文件可预览 */}
-                        {(isImageFile(item) ||
-                            isTextFile(item) ||
-                            isAudioFile(item) ||
-                            isMarkdownFile(item)) && (
-                            <Link
-                                href={`/preview/${item.id}`}
-                                className="inline-flex text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0 font-medium text-black dark:text-white"
-                            >
-                                {t("preview")}
-                            </Link>
-                        )}
+                            {!isSelecting &&
+                                (isImageFile(item) ||
+                                    isTextFile(item) ||
+                                    isAudioFile(item) ||
+                                    isMarkdownFile(item)) && (
+                                    <Link
+                                        href={`/preview/${item.id}`}
+                                        className="inline-flex text-sm bg-black/5 px-3 py-1 font-medium text-black transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
+                                    >
+                                        {t("preview")}
+                                    </Link>
+                                )}
 
-                        {isAdmin && (
-                            <DriveItemActions
-                                isOpen={actionsOpen}
-                                disabled={
-                                    deletingId === item.id ||
-                                    (renaming && renameDialogItem?.id === item.id)
-                                }
-                                onOpen={() => setOpenMenuId(item.id)}
-                                onClose={() => setOpenMenuId(null)}
-                                onRename={() => {
-                                    setRenameDialogItem(item);
-                                    setRenameDialogError(null);
-                                }}
-                                onDelete={() => {
-                                    setDeleteDialogItem(item);
-                                    setDeleteDialogError(null);
-                                }}
-                            />
-                        )}
+                            {isAdmin && !isSelecting && (
+                                <DriveItemActions
+                                    isOpen={actionsOpen}
+                                    disabled={
+                                        deletingId === item.id ||
+                                        (renaming && renameDialogItem?.id === item.id)
+                                    }
+                                    onOpen={() => setOpenMenuId(item.id)}
+                                    onClose={() => setOpenMenuId(null)}
+                                    onRename={() => {
+                                        setRenameDialogItem(item);
+                                        setRenameDialogError(null);
+                                    }}
+                                    onDelete={() => {
+                                        setDeleteDialogItem(item);
+                                        setDeleteDialogError(null);
+                                    }}
+                                />
+                            )}
 
-                        <div className="flex flex-col sm:flex-row w-full sm:w-auto sm:ml-auto gap-0.5 sm:gap-4 text-sm text-black/50 dark:text-white/50">
-                            <span className="group-hover:text-black dark:group-hover:text-white transition-colors">
-                                {formatSize(item.size)}
-                            </span>
-                            <span className="sm:text-right group-hover:text-black dark:group-hover:text-white transition-colors">
-                                {formatDate(item.lastModifiedDateTime)}
-                            </span>
-                        </div>
-                    </motion.li>
-                );
-            })}
+                            <div className="flex w-full flex-col gap-0.5 text-sm text-black/50 transition-colors group-hover:text-black dark:text-white/50 dark:group-hover:text-white sm:ml-auto sm:w-auto sm:flex-row sm:gap-4">
+                                <span>{formatSize(item.size)}</span>
+                                <span className="sm:text-right">{formatDate(item.lastModifiedDateTime)}</span>
+                            </div>
+                        </motion.li>
+                    );
+                })}
             </ul>
             {isAdmin && (
                 <CreateFolderDialog
@@ -358,6 +520,21 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                         if (deletingId === deleteDialogItem.id) return;
                         setDeleteDialogItem(null);
                         setDeleteDialogError(null);
+                    }}
+                />
+            )}
+            {isAdmin && bulkDialogOpen && selectedCount > 0 && (
+                <ConfirmBulkDeleteDialog
+                    open={bulkDialogOpen}
+                    count={selectedCount}
+                    names={selectedItems.map((entry) => entry.name)}
+                    loading={bulkDeleting}
+                    error={bulkDeleteError}
+                    onConfirm={handleBulkDelete}
+                    onClose={() => {
+                        if (bulkDeleting) return;
+                        setBulkDialogOpen(false);
+                        setBulkDeleteError(null);
                     }}
                 />
             )}
