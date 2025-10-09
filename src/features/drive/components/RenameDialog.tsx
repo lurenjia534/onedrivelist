@@ -68,7 +68,7 @@ export default function RenameDialog({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-40 flex items-center justify-center"
+          className="fixed inset-0 z-[70] flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -76,7 +76,7 @@ export default function RenameDialog({
           <motion.div
             aria-hidden
             onClick={handleClose}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 z-0 bg-black/40 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -85,7 +85,7 @@ export default function RenameDialog({
           <motion.div
             role="dialog"
             aria-modal="true"
-            className="relative z-50 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900"
+            className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900"
             initial={{ y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 24, opacity: 0 }}
