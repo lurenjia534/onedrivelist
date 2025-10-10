@@ -31,6 +31,7 @@ import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import RenameDialog from "./RenameDialog";
 import DriveItemActions from "./DriveItemActions";
 import ConfirmBulkDeleteDialog from "./ConfirmBulkDeleteDialog";
+import UploadButton from "./UploadButton";
 
 export type DriveListItem = {
     id: string;
@@ -142,6 +143,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
     const [bulkDeleting, setBulkDeleting] = useState(false);
     const [bulkDeleteError, setBulkDeleteError] = useState<string | null>(null);
+    const currentFolderId = basePathSegments.at(-1);
 
     const isSelecting = selectionMode || selectedIds.length > 0;
     const selectedItems = localItems.filter((item) => selectedIds.includes(item.id));
@@ -193,7 +195,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     };
 
     const handleCreateFolder = async (name: string): Promise<boolean> => {
-        const parentId = basePathSegments.at(-1);
+        const parentId = currentFolderId;
         setCreating(true);
         setDialogError(null);
         try {
@@ -297,6 +299,13 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
         setBulkDeleting(false);
     };
 
+    const handleUploadSuccess = (item: DriveListItem) => {
+        setLocalItems((prev) => {
+            const filtered = prev.filter((entry) => entry.id !== item.id);
+            return [item, ...filtered];
+        });
+    };
+
     const handleRename = async (name: string): Promise<boolean> => {
         if (!renameDialogItem) return false;
         setRenaming(true);
@@ -381,6 +390,11 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                                 {bulkDeleting ? t("bulk.delete.deleting") : t("bulk.delete.action")}
                             </button>
                         )}
+                        <UploadButton
+                            parentId={currentFolderId ?? undefined}
+                            disabled={creating || bulkDeleting}
+                            onSuccess={handleUploadSuccess}
+                        />
                         <button
                             type="button"
                             onClick={() => {
