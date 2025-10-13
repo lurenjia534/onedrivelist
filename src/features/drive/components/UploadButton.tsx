@@ -90,7 +90,7 @@ export default function UploadButton({ parentId, disabled = false, onSuccess }: 
       }));
 
       try {
-        const sessionRes = await fetch("/api/onedrive/upload/session", {
+        const sessionRes = await fetch("/api/onedrive/upload", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
