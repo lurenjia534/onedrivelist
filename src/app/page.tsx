@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getDict } from "@/i18n/server";
 import { cookies } from "next/headers";
 
-export const revalidate = 0;
+export const revalidate = 600;
 
 export default async function Page() {
     if (!process.env.ONEDRIVE_REFRESH_TOKEN) {

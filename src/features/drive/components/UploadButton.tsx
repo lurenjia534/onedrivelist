@@ -173,6 +173,15 @@ export default function UploadButton({ parentId, disabled = false, onSuccess }: 
           controller: null,
         }));
         onSuccessRef.current?.(item);
+        try {
+          await fetch("/api/onedrive/revalidate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ parentId: task.targetParentId ?? null }),
+          });
+        } catch {
+          // ignore revalidate errors
+        }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           updateTask(taskId, (current) => ({
