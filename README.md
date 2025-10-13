@@ -15,10 +15,12 @@ password is ```123456```
 ## Features
 
 - **Secure Authentication**: Uses Auth.js (NextAuth.js) with the Microsoft Entra ID provider for robust and secure user login.
-- **Optional Password Protection**: Require a password before accessing the site when configured.
+- **Visitor & Admin Passwords**: Gate browse access behind `password`, and unlock management tools with a separate `ADMIN_PASSWORD`.
 - **Dynamic File Browsing**: Navigate through your OneDrive folders using a clean and intuitive interface.
 - **Persistent, Shareable Links**: Each folder has a unique URL (`/files/...`) that can be shared directly.
 - **File Previews**: View images, text files, and audio directly in the browser.
+- **Admin-Only File Management**: Admins can create folders, rename items, delete single or multiple entries, and upload files directly from the UI.
+- **Large File Uploads**: Admin uploads stream straight to Microsoft Graph using resumable sessions, supporting files up to 250 GB while bypassing Vercel’s 4.5 MB request limit.
 - **Modern Tech Stack**: Built with the latest features of Next.js 15 (App Router), React 19, and TypeScript.
 - **Beautiful UI**: Styled with Tailwind CSS for a responsive and modern design.
 - **Smooth Animations**: Utilizes Framer Motion for fluid and engaging user interface animations.
@@ -96,12 +98,14 @@ After completing the above steps, you can continue to configure environment vari
     - `AUTH_MICROSOFT_ENTRA_ID_SECRET`: Your **client secret value** from the Entra App Registration.
     - `AUTH_MICROSOFT_ENTRA_ID_ISSUER`: The issuer URL from the Entra App Registration (e.g., `https://login.microsoftonline.com/common/v2.0`).
     - `ONEDRIVE_REFRESH_TOKEN`: **Leave this blank for now.** You will obtain it in the next step.
-    - `password` (optional): Adds a simple access password. When set, visitors must first visit `/login` and enter this value.
+    - `password` (optional): Adds a read-only access password. When set, visitors must first visit `/login` and enter this value.
+    - `ADMIN_PASSWORD` (optional but recommended): Grants administrator access. Only sessions authenticated with this password can create folders, upload, rename, or delete OneDrive items.
 
       Example in `.env.local`:
 
       ```env
       password=<your-password>
+      ADMIN_PASSWORD=<your-admin-password>
       ```
 
 ### 5. Generate Your OneDrive Refresh Token
@@ -134,6 +138,13 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see your OneDrive files.
+
+## Admin Authentication & Permissions
+
+- Visit `/login` to authenticate. Entering `password` (if configured) grants browse/preview access. Entering `ADMIN_PASSWORD` sets an elevated session (`pwd-role=admin`) and unlocks management controls in the UI.
+- Admins see extra buttons for creating folders, uploading files (with resumable Microsoft Graph sessions up to 250 GB), renaming entries, single-item delete, and bulk delete.
+- All destructive API routes (`/api/onedrive/**`) require a valid hashed cookie (`pwd-auth`) and explicitly check for admin privileges before performing writes, keeping visitor sessions read-only.
+- Without any password configured the site is fully public. Without `ADMIN_PASSWORD`, advanced actions stay hidden even if a visitor password is configured.
 
 ## Deployment on Vercel
 
