@@ -4,7 +4,7 @@ import { DriveList, Breadcrumbs, generateBreadcrumbs } from "@/features/drive";
 import { getDict } from "@/i18n/server";
 import { cookies } from "next/headers";
 
-export const revalidate = 600;
+export const revalidate = 0;
 
 // Next 15: params 是一个 thenable，必须写成 Promise
 export default async function Page({

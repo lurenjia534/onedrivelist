@@ -56,7 +56,8 @@ type ConflictBehavior = "fail" | "replace" | "rename";
 export async function listChildren(itemId?: string): Promise<DriveItemListResponse> {
   const endpoint = itemId ? `/me/drive/items/${itemId}/children` : "/me/drive/root/children";
   const res = await graphFetch(`${endpoint}?${ITEM_SELECT}`, {
-    next: { revalidate: 600 },
+    cache: "no-store",
+    next: { revalidate: 0 },
   });
   return (await res.json()) as DriveItemListResponse;
 }

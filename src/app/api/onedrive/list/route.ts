@@ -1,7 +1,7 @@
 import { listChildren } from "@/services/onedrive/repo";
 import { toErrorResponse } from "@/lib/errors";
 
-export const revalidate = 600;
+export const revalidate = 0;
 
 export async function GET() {
   try {
