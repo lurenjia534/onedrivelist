@@ -73,6 +73,11 @@ const zh = {
   "drive.personal": "OneDrive 个人网盘",
   "drive.business": "OneDrive 商业版网盘",
   "error.onedrive": "无法读取 OneDrive 数据：{message}",
+  "error.title": "出错了",
+  "error.expired.title": "Microsoft 刷新令牌已过期",
+  "error.expired.desc": "当前配置的 Refresh Token 因 90 天未使用而失效。请网站管理员重新获取新的 Refresh Token，更新部署环境变量 ONEDRIVE_REFRESH_TOKEN 并重新部署。",
+  "error.action.home": "返回首页",
+  "error.action.docs": "查看排障指南",
 
   // Breadcrumbs
   "breadcrumbs.unknown": "[未知文件夹]",

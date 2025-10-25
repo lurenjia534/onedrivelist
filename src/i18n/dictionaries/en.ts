@@ -73,6 +73,11 @@ const en = {
   "drive.personal": "OneDrive Personal drive",
   "drive.business": "OneDrive for Business drive",
   "error.onedrive": "Failed to read OneDrive data: {message}",
+  "error.title": "Something went wrong",
+  "error.expired.title": "Microsoft refresh token expired",
+  "error.expired.desc": "The configured refresh token is no longer valid due to 90 days of inactivity. The site owner needs to obtain a new refresh token and update the ONEDRIVE_REFRESH_TOKEN environment variable, then redeploy.",
+  "error.action.home": "Back to Home",
+  "error.action.docs": "Troubleshooting Guide",
 
   // Breadcrumbs
   "breadcrumbs.unknown": "[Unknown folder]",
