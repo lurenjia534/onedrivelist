@@ -4,6 +4,7 @@ import { DriveList, Breadcrumbs } from "@/features/drive";
 import { redirect } from "next/navigation";
 import { getDict } from "@/i18n/server";
 import { cookies } from "next/headers";
+import ErrorState from "@/shared/ui/ErrorState";
 
 export const revalidate = 600;
 
@@ -35,7 +36,25 @@ export default async function Page() {
     } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
         const { dict } = await getDict();
-        const text = (dict["error.onedrive"] ?? "Error: {message}").replace("{message}", message);
-        return <p className="text-red-600">{text}</p>;
+        const isRefreshExpired = /AADSTS700082|refresh token has expired/i.test(message);
+        if (isRefreshExpired) {
+            return (
+                <ErrorState
+                    title={dict["error.expired.title"]}
+                    description={dict["error.expired.desc"]}
+                    details={(dict["error.onedrive"] ?? "Error: {message}").replace("{message}", message)}
+                    actions={[
+                        { href: "/", label: dict["error.action.home"], variant: "primary" },
+                    ]}
+                />
+            );
+        }
+        return (
+            <ErrorState
+                title={dict["error.title"]}
+                details={(dict["error.onedrive"] ?? "Error: {message}").replace("{message}", message)}
+                actions={[{ href: "/", label: dict["error.action.home"], variant: "primary" }]}
+            />
+        );
     }
 }
