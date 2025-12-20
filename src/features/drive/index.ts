@@ -1,3 +1,5 @@
 export { default as DriveList } from "./components/DriveList";
 export type { DriveListItem } from "./components/DriveList";
 export { default as Breadcrumbs, generateBreadcrumbs } from "./components/Breadcrumbs";
+export { default as ViewModeToggle } from "./components/ViewModeToggle";
+export type { ViewMode } from "./components/ViewModeToggle";

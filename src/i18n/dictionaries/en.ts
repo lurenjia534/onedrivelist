@@ -126,7 +126,7 @@ const en = {
   // Not Found
   "notfound.badge": "Page not found",
   "notfound.title": "Looks like you're lost",
-  "notfound.desc": "The page you requested doesn’t exist or was moved. Let’s get you back on track.",
+  "notfound.desc": "The page you requested doesn't exist or was moved. Let's get you back on track.",
   "notfound.home": "Go Home",
   "notfound.refresh": "Refresh Page",
   "notfound.help": "Need help?",
@@ -143,6 +143,10 @@ const en = {
   // Copy
   "copy.copied": "Copied",
   "copy.copy": "Copy",
+
+  // View mode
+  "view.list": "List view",
+  "view.grid": "Grid view",
 };
 
 export default en;

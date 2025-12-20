@@ -5,7 +5,7 @@ const zh = {
   "preview": "预览",
   "delete.action": "删除",
   "delete.deleting": "正在删除…",
-  "delete.confirm": "确定要删除“{name}”吗？此操作会将该项移动到回收站。",
+  "delete.confirm": "确定要删除\"{name}\"吗？此操作会将该项移动到回收站。",
   "delete.error": "删除失败：{message}",
   "delete.dialog.title": "确认移至回收站？",
   "delete.dialog.subtitle": "删除后可在 OneDrive 回收站中恢复。",
@@ -143,6 +143,10 @@ const zh = {
   // Copy
   "copy.copied": "已复制",
   "copy.copy": "复制",
+
+  // View mode
+  "view.list": "列表视图",
+  "view.grid": "网格视图",
 };
 
 export default zh;
