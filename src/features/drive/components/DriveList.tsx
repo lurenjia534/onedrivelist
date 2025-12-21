@@ -144,12 +144,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
     const [bulkDeleting, setBulkDeleting] = useState(false);
     const [bulkDeleteError, setBulkDeleteError] = useState<string | null>(null);
-    const [viewMode, setViewMode] = useState<ViewMode>(() => {
-        if (typeof window !== "undefined") {
-            return (localStorage.getItem("driveViewMode") as ViewMode) || "list";
-        }
-        return "list";
-    });
+    const [viewMode, setViewMode] = useState<ViewMode>("list");
     const currentFolderId = basePathSegments.at(-1);
 
     const isSelecting = selectionMode || selectedIds.length > 0;
@@ -170,6 +165,16 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
             setOpenMenuId(null);
         }
     }, [isSelecting, openMenuId]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const stored = localStorage.getItem("driveViewMode");
+        if (stored === "list" || stored === "grid") {
+            setViewMode(stored);
+        } else if (stored) {
+            localStorage.removeItem("driveViewMode");
+        }
+    }, []);
 
     const handleViewModeChange = (mode: ViewMode) => {
         setViewMode(mode);
