@@ -32,6 +32,7 @@ import RenameDialog from "./RenameDialog";
 import DriveItemActions from "./DriveItemActions";
 import ConfirmBulkDeleteDialog from "./ConfirmBulkDeleteDialog";
 import UploadButton from "./UploadButton";
+import ViewModeToggle, { type ViewMode } from "./ViewModeToggle";
 
 export type DriveListItem = {
     id: string;
@@ -143,6 +144,7 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
     const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
     const [bulkDeleting, setBulkDeleting] = useState(false);
     const [bulkDeleteError, setBulkDeleteError] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<ViewMode>("list");
     const currentFolderId = basePathSegments.at(-1);
 
     const isSelecting = selectionMode || selectedIds.length > 0;
@@ -163,6 +165,23 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
             setOpenMenuId(null);
         }
     }, [isSelecting, openMenuId]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const stored = localStorage.getItem("driveViewMode");
+        if (stored === "list" || stored === "grid") {
+            setViewMode(stored);
+        } else if (stored) {
+            localStorage.removeItem("driveViewMode");
+        }
+    }, []);
+
+    const handleViewModeChange = (mode: ViewMode) => {
+        setViewMode(mode);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("driveViewMode", mode);
+        }
+    };
 
     const handleSelectionModeToggle = () => {
         if (isSelecting) {
@@ -339,9 +358,10 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
 
     return (
         <>
-            {isAdmin && (
-                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-wrap items-center gap-2">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                    <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+                    {isAdmin && (
                         <button
                             type="button"
                             onClick={handleSelectionModeToggle}
@@ -350,66 +370,73 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                         >
                             {isSelecting ? t("bulk.select.exit") : t("bulk.select.enter")}
                         </button>
-                        {isSelecting && localItems.length > 0 && (
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={handleSelectAll}
-                                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-                                    disabled={!localItems.length}
-                                >
-                                    {allSelected ? t("bulk.select.none") : t("bulk.select.all")}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleClearSelection}
-                                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-                                    disabled={!selectedCount}
-                                >
-                                    {t("bulk.select.clear")}
-                                </button>
-                                {selectedCount > 0 && (
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t("bulk.selected.count", { count: selectedCount })}
-                                    </span>
-                                )}
-                            </>
-                        )}
-                    </div>
-                    <div className="flex flex-wrap items-center justify-end gap-2">
-                        {isSelecting && selectedCount > 0 && (
+                    )}
+                    {isAdmin && isSelecting && localItems.length > 0 && (
+                        <>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setBulkDeleteError(null);
-                                    setBulkDialogOpen(true);
-                                }}
-                                disabled={bulkDeleting}
-                                className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+                                onClick={handleSelectAll}
+                                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                                disabled={!localItems.length}
                             >
-                                {bulkDeleting ? t("bulk.delete.deleting") : t("bulk.delete.action")}
+                                {allSelected ? t("bulk.select.none") : t("bulk.select.all")}
                             </button>
-                        )}
-                        <UploadButton
-                            parentId={currentFolderId ?? undefined}
-                            disabled={creating || bulkDeleting}
-                            onSuccess={handleUploadSuccess}
-                        />
+                            <button
+                                type="button"
+                                onClick={handleClearSelection}
+                                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                                disabled={!selectedCount}
+                            >
+                                {t("bulk.select.clear")}
+                            </button>
+                            {selectedCount > 0 && (
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {t("bulk.selected.count", { count: selectedCount })}
+                                </span>
+                            )}
+                        </>
+                    )}
+                </div>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                    {isAdmin && isSelecting && selectedCount > 0 && (
                         <button
                             type="button"
                             onClick={() => {
-                                setDialogError(null);
-                                setDialogOpen(true);
+                                setBulkDeleteError(null);
+                                setBulkDialogOpen(true);
                             }}
-                            disabled={creating}
-                            className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                            disabled={bulkDeleting}
+                            className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
                         >
-                            <FolderPlus size={16} />
-                            <span>{t("folder.create")}</span>
+                            {bulkDeleting ? t("bulk.delete.deleting") : t("bulk.delete.action")}
                         </button>
-                    </div>
+                    )}
+                    {isAdmin && (
+                        <>
+                            <UploadButton
+                                parentId={currentFolderId ?? undefined}
+                                disabled={creating || bulkDeleting}
+                                onSuccess={handleUploadSuccess}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setDialogError(null);
+                                    setDialogOpen(true);
+                                }}
+                                disabled={creating}
+                                className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                            >
+                                <FolderPlus size={16} />
+                                <span>{t("folder.create")}</span>
+                            </button>
+                        </>
+                    )}
                 </div>
-            )}
+            </div>
+
+            {/* List View */}
+            {viewMode === "list" && (
             <ul className="space-y-2">
                 {localItems.map((item, idx) => {
                     const newPathSegments = [...basePathSegments, item.id];
@@ -511,6 +538,124 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                     );
                 })}
             </ul>
+            )}
+
+            {/* Grid View */}
+            {viewMode === "grid" && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                {localItems.map((item, idx) => {
+                    const newPathSegments = [...basePathSegments, item.id];
+                    const href = `/files/${newPathSegments.join("/")}`;
+
+                    const Icon = item.folder ? Folder : getFileIcon(item.name);
+                    const isSelected = selectedIds.includes(item.id);
+                    const canPreview = isImageFile(item) || isTextFile(item) || isAudioFile(item) || isMarkdownFile(item);
+
+                    const cardClasses = [
+                        "relative flex flex-col items-center rounded-xl p-4 transition-all duration-200 group",
+                        "bg-gray-50 hover:bg-white dark:bg-gray-900 dark:hover:bg-black",
+                        isSelected ? "ring-2 ring-black/30 dark:ring-white/40" : "",
+                        isSelecting ? "cursor-pointer" : "",
+                    ]
+                        .filter(Boolean)
+                        .join(" ");
+
+                    const handleCardClick = () => {
+                        if (isSelecting) {
+                            toggleSelection(item.id);
+                        }
+                    };
+
+                    return (
+                        <motion.div
+                            key={item.id}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: idx * 0.03 }}
+                            whileHover={isSelecting ? undefined : { scale: 1.03 }}
+                            className={cardClasses}
+                            onClick={handleCardClick}
+                        >
+                            {isSelecting && (
+                                <div className="absolute top-2 left-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => toggleSelection(item.id)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:ring-white"
+                                        aria-label={t("bulk.select.item", { name: item.name })}
+                                    />
+                                </div>
+                            )}
+
+                            {isAdmin && !isSelecting && (
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <DriveItemActions
+                                        isOpen={openMenuId === item.id}
+                                        disabled={
+                                            deletingId === item.id ||
+                                            (renaming && renameDialogItem?.id === item.id)
+                                        }
+                                        onOpen={() => setOpenMenuId(item.id)}
+                                        onClose={() => setOpenMenuId(null)}
+                                        onRename={() => {
+                                            setRenameDialogItem(item);
+                                            setRenameDialogError(null);
+                                        }}
+                                        onDelete={() => {
+                                            setDeleteDialogItem(item);
+                                            setDeleteDialogError(null);
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100 text-black/70 transition-colors group-hover:bg-gray-200 group-hover:text-black dark:bg-gray-800 dark:text-white/70 dark:group-hover:bg-gray-700 dark:group-hover:text-white">
+                                <Icon size={32} />
+                            </div>
+
+                            {isSelecting ? (
+                                <span className="w-full truncate text-center text-sm font-medium text-black/70 dark:text-white/70">
+                                    {item.name}
+                                </span>
+                            ) : item.folder ? (
+                                <Link
+                                    href={href}
+                                    className="w-full truncate text-center text-sm font-medium text-black hover:underline dark:text-white"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {item.name}
+                                </Link>
+                            ) : (
+                                <a
+                                    href={`/api/onedrive/download/${item.id}`}
+                                    className="w-full truncate text-center text-sm font-medium text-black hover:underline dark:text-white"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {item.name}
+                                </a>
+                            )}
+
+                            <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                {formatSize(item.size)}
+                            </span>
+
+                            {!isSelecting && canPreview && (
+                                <Link
+                                    href={`/preview/${item.id}`}
+                                    className="mt-2 inline-flex rounded-md bg-black/5 px-2 py-1 text-xs font-medium text-black transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {t("preview")}
+                                </Link>
+                            )}
+                        </motion.div>
+                    );
+                })}
+            </div>
+            )}
+
             {isAdmin && (
                 <CreateFolderDialog
                     open={isDialogOpen}
