@@ -4,8 +4,9 @@ import {
     isAudioExtension,
     isTextExtension,
     isMarkdownExtension,
+    isPdfExtension,
 } from "@/lib/fileTypes";
-import { AudioPlayer, TextPreview, ImagePreview } from "@/features/preview";
+import { AudioPlayer, TextPreview, ImagePreview, PdfPreview } from "@/features/preview";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -59,6 +60,15 @@ export default async function PreviewPage({
                     <div className="w-full max-w-xl">
                         <AudioPlayer src={url} />
                     </div>
+                </div>
+            );
+        }
+
+        if (isPdfExtension(ext)) {
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-2xl font-bold mb-4">{item.name}</h1>
+                    <PdfPreview src={url} title={item.name} />
                 </div>
             );
         }

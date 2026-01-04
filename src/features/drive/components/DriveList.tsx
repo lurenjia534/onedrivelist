@@ -24,6 +24,7 @@ import {
     isImageExtension,
     isTextExtension,
     isMarkdownExtension,
+    isPdfExtension,
 } from "@/lib/fileTypes";
 import { useEffect, useState } from "react";
 import CreateFolderDialog from "./CreateFolderDialog";
@@ -124,6 +125,14 @@ function isAudioFile(item: DriveListItem): boolean {
 function isMarkdownFile(item: DriveListItem): boolean {
     const ext = getExtension(item.name);
     return !!item.file && ["md", "markdown"].includes(ext);
+}
+
+function isPdfFile(item: DriveListItem): boolean {
+    const ext = getExtension(item.name);
+    return (
+        !!item.file &&
+        (item.file.mimeType === "application/pdf" || isPdfExtension(ext))
+    );
 }
 
 export default function DriveList({ items, basePathSegments = [], isAdmin = false, onDeleteSuccess }: DriveListProps) {
@@ -501,7 +510,8 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
                                 (isImageFile(item) ||
                                     isTextFile(item) ||
                                     isAudioFile(item) ||
-                                    isMarkdownFile(item)) && (
+                                    isMarkdownFile(item) ||
+                                    isPdfFile(item)) && (
                                     <Link
                                         href={`/preview/${item.id}`}
                                         className="inline-flex text-sm bg-black/5 px-3 py-1 font-medium text-black transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
@@ -549,7 +559,12 @@ export default function DriveList({ items, basePathSegments = [], isAdmin = fals
 
                     const Icon = item.folder ? Folder : getFileIcon(item.name);
                     const isSelected = selectedIds.includes(item.id);
-                    const canPreview = isImageFile(item) || isTextFile(item) || isAudioFile(item) || isMarkdownFile(item);
+                    const canPreview =
+                        isImageFile(item) ||
+                        isTextFile(item) ||
+                        isAudioFile(item) ||
+                        isMarkdownFile(item) ||
+                        isPdfFile(item);
 
                     const cardClasses = [
                         "relative flex flex-col items-center rounded-xl p-4 transition-all duration-200 group",

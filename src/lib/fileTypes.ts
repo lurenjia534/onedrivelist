@@ -30,6 +30,10 @@ export const markdownExtensions = [
   'mdx',
 ] as const;
 
+export const pdfExtensions = [
+  'pdf',
+] as const;
+
 export type ExtensionArray = readonly string[];
 
 export function getExtension(name: string): string {
@@ -55,4 +59,8 @@ export function isTextExtension(ext: string): boolean {
 
 export function isMarkdownExtension(ext: string): boolean {
   return isExtension(ext, markdownExtensions);
+}
+
+export function isPdfExtension(ext: string): boolean {
+  return isExtension(ext, pdfExtensions);
 }
